@@ -1,5 +1,5 @@
 
-![Cover](./assets/cover.png)
+![Cover](./assets/Cover.png)
 
 # DOME IOT
 
