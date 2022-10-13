@@ -13,7 +13,7 @@
 /*************************************************************************************************
  **                                          DEFINES
  *************************************************************************************************/
-#define DEBUG true
+#define DEBUG false
 
 #define SSID_ADDR 0
 #define PASS_ADDR 50
@@ -51,7 +51,6 @@ char deviceId[EEPROM_BLOCK_SIZE];
 
 char pathBuffer[100];
 char serialBuffer[100];
-bool savedConfig = false;
 FirebaseData stream;
 FirebaseData fbdo;
 FirebaseAuth auth;
@@ -105,9 +104,7 @@ void setConfig() {
   writeEepromString(HOME_ID_ADDR, home_id);
   writeEepromString(DEVICE_ID_ADDR, device_id);
 
-  server.send(200, "text/plain", "OK");
-  server.close();
-  savedConfig = true;
+  serverSendOk();
 }
 
 void writeEepromString(int addr, String data) {
@@ -166,8 +163,10 @@ void scanNetworks() {
   }
 }
 
-void sendOk() {
-  server.send(200, "text/plain", "OK");
+void serverSendOk() {
+  server.sendHeader("Connection", "close");
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.send(200, "text/plain", "OK\r\n");
 }
 
 void connectionMode() {
@@ -196,12 +195,12 @@ void configurationMode() {
   Serial.print("Access point ip: ");
   Serial.println(WiFi.softAPIP());
 
-  server.on("/", sendOk);
+  server.on("/", serverSendOk);
   server.on("/set", setConfig);
   server.on("/scan", scanNetworks);
   server.begin();
 
-  while (!savedConfig) {
+  while (true) {
     server.handleClient();
   }
 }
@@ -234,7 +233,7 @@ void firebaseBegin() {
 
   // Begin stream and set stream callback
   if (!Firebase.RTDB.beginStream(&stream, "/" + String(homeId) + "/" + String(deviceId))) {
-    Serial.printf("sream begin error, %s\n\n", stream.errorReason().c_str());
+    Serial.printf("stream begin error, %s\n\n", stream.errorReason().c_str());
   }
   Firebase.RTDB.setStreamCallback(&stream, streamCallback, streamTimeoutCallback);
 }
@@ -293,6 +292,7 @@ void setup() {
   pinMode(NODE1_BTN, INPUT);
   pinMode(NODE2_BTN, INPUT);
   pinMode(NODE3_BTN, INPUT);
+
   pinMode(NODE1_PIN, OUTPUT);
   pinMode(NODE2_PIN, OUTPUT);
   pinMode(NODE3_PIN, OUTPUT);
