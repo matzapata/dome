@@ -6,7 +6,7 @@
 #include <EEPROM.h>
 #include <ArduinoJson.h>  // @5.13.5
 #include "Secrets.h"
-#include <Firebase_ESP_Client.h>
+#include <Firebase_ESP_Client.h> // 4.1.0
 #include <addons/TokenHelper.h>
 #include <addons/RTDBHelper.h>
 
