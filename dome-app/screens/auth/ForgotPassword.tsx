@@ -2,7 +2,13 @@ import React from "react";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { StatusBar } from "expo-status-bar";
-import { Text, View, TextInput, TouchableOpacity } from "react-native";
+import {
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+} from "react-native";
 import { AuthStackParamList } from "../../navigation/authStack";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
@@ -15,7 +21,7 @@ export default function ForgotPassword() {
   const navigation = useNavigation<ForgotPasswordScreenProp>();
 
   return (
-    <View>
+    <KeyboardAvoidingView>
       <View>
         <View className="w-full px-4 my-24">
           <Text className="text-3xl font-extrabold">Forgot password</Text>
@@ -47,6 +53,6 @@ export default function ForgotPassword() {
       </View>
 
       <StatusBar style="auto" />
-    </View>
+    </KeyboardAvoidingView>
   );
 }

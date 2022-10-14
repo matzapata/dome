@@ -1,12 +1,19 @@
-import { StatusBar } from 'expo-status-bar';
-import { Text, View } from 'react-native';
+import React from "react";
+import { Text, TouchableOpacity, View } from "react-native";
+import { useAuthentication } from "../hooks/useAuthentication";
+import { getAuth, signOut } from "firebase/auth";
 
-export default function Home() {
+const auth = getAuth();
+
+export default function HomeScreen() {
+  const { user } = useAuthentication();
+
   return (
-    <View className="flex-1 mt bg-red-500 items-center justify-center">
-      <Text>Home</Text>
-      <StatusBar style="auto" />
+    <View>
+      <Text>Welcome {user?.email}!</Text>
+      <TouchableOpacity onPress={() => signOut(auth)}>
+        <Text>Sign out</Text>
+      </TouchableOpacity>
     </View>
   );
 }
-
