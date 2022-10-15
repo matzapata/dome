@@ -4,7 +4,7 @@ import { HeaderWithConfirmation } from "../components/Headers";
 
 export default function PersonalInformationScreen() {
   return (
-    <View>
+    <View className="bg-white">
       <HeaderWithConfirmation
         title="Personal information"
         onConfirmation={() => console.log("Confirmed")}

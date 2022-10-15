@@ -2,17 +2,13 @@ import React from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { Header } from "../components/Headers";
 import Ionicons from "@expo/vector-icons/Ionicons";
-
-const people = [
-  { id: "a", name: "Juan Perez", email: "juanperez@gmail.com" },
-  { id: "b", name: "Juana Perez", email: "juanperez@gmail.com" },
-  { id: "c", name: "Gonzalo Perez", email: "juanperez@gmail.com" },
-];
-// const people = [];
+import { useAppSelector } from "../redux/store";
 
 export default function PeopleScreen() {
+  const people = useAppSelector((state) => state.dome.people);
+
   return (
-    <View>
+    <View className="bg-white">
       <Header title="People" />
 
       {people.length === 0 ? (

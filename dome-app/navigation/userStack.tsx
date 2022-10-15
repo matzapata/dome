@@ -6,12 +6,16 @@ import HomeScreen from "../screens/Home";
 import SettingsScreen from "../screens/Settings";
 import PersonalInformationScreen from "../screens/PersonalInformation";
 import PeopleScreen from "../screens/People";
+import DeviceScreen from "../screens/Device";
+import DeviceSwitchScreen from "../screens/DeviceSwitch";
 
 export type UserStackParamList = {
   Home: undefined;
   Settings: undefined;
   PersonalInformation: undefined;
   People: undefined;
+  Device: { id: string };
+  DeviceSwitch: { deviceId: string; id: string };
 };
 
 const Stack = createStackNavigator();
@@ -38,6 +42,16 @@ export default function UserStack() {
         <Stack.Screen
           name="People"
           component={PeopleScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Device"
+          component={DeviceScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="DeviceSwitch"
+          component={DeviceSwitchScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

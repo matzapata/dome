@@ -1,5 +1,5 @@
 import React from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { UserStackParamList } from "../navigation/userStack";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -14,8 +14,8 @@ export default function HomeScreen() {
   const devices = useAppSelector((state) => state.dome.devices);
 
   return (
-    <ScrollView>
-      <View className="p-6 bg-black">
+    <ScrollView className="bg-white">
+      <View className="p-6 bg-[#0F0F0F]">
         <Text className="text-2xl font-bold text-white">Hi Matias 👋</Text>
         <Text className="text-white">Welcome to your dome</Text>
 
@@ -35,7 +35,7 @@ export default function HomeScreen() {
       <View className="p-6">
         {devices.map((d) => (
           <View key={d.id} className="mb-2">
-            <Text className="mb-2 text-xs text-gray-500 uppercase">
+            <Text className="mb-2 text-xs font-medium text-gray-500 uppercase">
               {d.name}
             </Text>
             {d.switches.map((s) => (

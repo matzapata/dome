@@ -1,22 +1,36 @@
 import React, { useState } from "react";
-import { Switch, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { DomeSwitch } from "../redux/slices/dome";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import ToggleSwitch from "toggle-switch-react-native";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { UserStackParamList } from "../navigation/userStack";
+
+type HomeScreenProp = StackNavigationProp<UserStackParamList, "Home">;
 
 export default function SwitchCard({ domeSwitch }: { domeSwitch: DomeSwitch }) {
   const [isEnabled, setIsEnabled] = useState(domeSwitch.state);
-  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
+  const navigation = useNavigation<HomeScreenProp>();
 
   return (
     <View
       className={`${
         isEnabled
           ? "bg-[#AFD4F7] border-[#80c1ff]"
-          : " border-gray-300 bg-gray-200"
-      } flex flex-row items-center border justify-between px-3 py-3 mb-2 rounded-md`}
+          : " border-gray-100 bg-[#F6F8FA]"
+      } flex flex-row items-center border justify-between px-3 py-6 mb-2 rounded-md`}
     >
-      <TouchableOpacity className="flex flex-row items-center">
+      <TouchableOpacity
+        className="flex flex-row items-center"
+        onPress={() =>
+          navigation.navigate("DeviceSwitch", {
+            id: domeSwitch.id,
+            deviceId: domeSwitch.deviceId,
+          })
+        }
+      >
         <View className="px-2 mr-2">
           <MaterialCommunityIcons
             name="lightbulb-on"
@@ -27,17 +41,16 @@ export default function SwitchCard({ domeSwitch }: { domeSwitch: DomeSwitch }) {
         <Text
           className={`${
             isEnabled ? "text-gray-700" : "text-[#64686C]"
-          } text-base`}
+          } text-base font-medium`}
         >
           {domeSwitch.name}
         </Text>
       </TouchableOpacity>
-      <Switch
-        trackColor={{ false: "#767577", true: "#2D3748" }}
-        thumbColor={isEnabled ? "#FFFFFF" : "#f4f3f4"}
-        ios_backgroundColor="#3e3e3e"
-        onValueChange={toggleSwitch}
-        value={isEnabled}
+      <ToggleSwitch
+        isOn={isEnabled}
+        onColor="black"
+        offColor="#CBD5E0"
+        onToggle={(isOn) => setIsEnabled(isOn)}
       />
     </View>
   );

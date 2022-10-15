@@ -18,7 +18,7 @@ export default function SettingsScreen() {
   const devices = useAppSelector((state) => state.dome.devices);
 
   return (
-    <View>
+    <View className="bg-white">
       <Header title="Settings" />
 
       <TouchableOpacity
@@ -53,14 +53,17 @@ export default function SettingsScreen() {
         <FlatList
           data={devices}
           renderItem={({ item }) => (
-            <TouchableOpacity className="flex flex-row justify-between py-4">
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Device", { id: item.id })}
+              className="flex flex-row justify-between py-4"
+            >
               <View className="flex flex-row items-center">
                 <MaterialCommunityIcons
                   name="lightbulb-on"
                   size={20}
-                  color="#3182CE"
+                  color="#718096"
                 />
-                <Text className="ml-4 text-base text-gray-900">
+                <Text className="ml-4 text-base font-medium text-gray-600">
                   {item.name}
                 </Text>
               </View>
