@@ -8,18 +8,14 @@ import { UserStackParamList } from "../navigation/userStack";
 import ResetDomeConfirmation from "../components/ResetDomeConfirmation";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useAppSelector } from "../redux/store";
 
 type SettingsScreenProp = StackNavigationProp<UserStackParamList, "Settings">;
 const auth = getAuth();
 
-// const devices = [
-//   { id: "a", name: "Dome abc" },
-//   { id: "b", name: "Dome cba" },
-// ];
-const devices: { id: string; name: string }[] = [];
-
 export default function SettingsScreen() {
   const navigation = useNavigation<SettingsScreenProp>();
+  const devices = useAppSelector((state) => state.dome.devices);
 
   return (
     <View>

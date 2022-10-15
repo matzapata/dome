@@ -1,13 +1,16 @@
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { UserStackParamList } from "../navigation/userStack";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { useAppSelector } from "../redux/store";
+import SwitchCard from "../components/SwitchCard";
 
 type HomeScreenProp = StackNavigationProp<UserStackParamList, "Home">;
 
 export default function HomeScreen() {
   const navigation = useNavigation<HomeScreenProp>();
+  const devices = useAppSelector((state) => state.dome.devices);
 
   return (
     <View>
@@ -27,14 +30,34 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
       </View>
-      <View className="p-6">
-        <Text className="text-xl font-bold text-center">
-          You haven&apos;t add any smart device to this dome yet.
-        </Text>
-        <Text className="mx-4 mt-2 text-center">
-          If someone else connected the devices already, join them
-        </Text>
-      </View>
+
+      <FlatList
+        data={devices}
+        renderItem={({ item }) => (
+          <View className="p-6">
+            <Text className="mb-2 text-xs text-gray-500 uppercase">
+              {item.name}
+            </Text>
+            <FlatList
+              data={item.switches}
+              renderItem={({ item }) => <SwitchCard domeSwitch={item} />}
+              keyExtractor={(s) => s.id}
+            />
+          </View>
+        )}
+        keyExtractor={(d) => d.id}
+      />
+
+      {devices.length === 0 && (
+        <View className="p-6">
+          <Text className="text-xl font-bold text-center">
+            You haven&apos;t add any smart device to this dome yet.
+          </Text>
+          <Text className="mx-4 mt-2 text-center">
+            If someone else connected the devices already, join them
+          </Text>
+        </View>
+      )}
     </View>
   );
 }

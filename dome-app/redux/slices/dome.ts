@@ -26,10 +26,30 @@ export interface DomeState {
   devices: DomeDevice[];
 }
 
+// const initialState: DomeState = {
+//   id: null,
+//   people: [],
+//   devices: [],
+// };
+
 const initialState: DomeState = {
-  id: null,
+  id: "dome_id",
   people: [],
-  devices: [],
+  devices: [
+    {
+      id: "abc",
+      name: "device",
+      switches: [
+        {
+          id: "a",
+          name: "Livingroom",
+          deviceId: "abc",
+          roomType: "bedroom",
+          state: false,
+        },
+      ],
+    },
+  ],
 };
 
 export const domeSlice = createSlice({
