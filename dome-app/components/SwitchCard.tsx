@@ -14,7 +14,7 @@ export default function SwitchCard({ domeSwitch }: { domeSwitch: DomeSwitch }) {
         isEnabled
           ? "bg-[#AFD4F7] border-[#80c1ff]"
           : " border-gray-300 bg-gray-200"
-      } flex flex-row items-center border justify-between px-3 py-3  rounded-md`}
+      } flex flex-row items-center border justify-between px-3 py-3 mb-2 rounded-md`}
     >
       <TouchableOpacity className="flex flex-row items-center">
         <View className="px-2 mr-2">

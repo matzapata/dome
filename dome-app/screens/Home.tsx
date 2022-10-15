@@ -5,6 +5,7 @@ import { UserStackParamList } from "../navigation/userStack";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useAppSelector } from "../redux/store";
 import SwitchCard from "../components/SwitchCard";
+import { ScrollView } from "react-native-gesture-handler";
 
 type HomeScreenProp = StackNavigationProp<UserStackParamList, "Home">;
 
@@ -13,7 +14,7 @@ export default function HomeScreen() {
   const devices = useAppSelector((state) => state.dome.devices);
 
   return (
-    <View>
+    <ScrollView>
       <View className="p-6 bg-black">
         <Text className="text-2xl font-bold text-white">Hi Matias 👋</Text>
         <Text className="text-white">Welcome to your dome</Text>
@@ -31,22 +32,18 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      <FlatList
-        data={devices}
-        renderItem={({ item }) => (
-          <View className="p-6">
+      <View className="p-6">
+        {devices.map((d) => (
+          <View key={d.id} className="mb-2">
             <Text className="mb-2 text-xs text-gray-500 uppercase">
-              {item.name}
+              {d.name}
             </Text>
-            <FlatList
-              data={item.switches}
-              renderItem={({ item }) => <SwitchCard domeSwitch={item} />}
-              keyExtractor={(s) => s.id}
-            />
+            {d.switches.map((s) => (
+              <SwitchCard domeSwitch={s} key={s.id} />
+            ))}
           </View>
-        )}
-        keyExtractor={(d) => d.id}
-      />
+        ))}
+      </View>
 
       {devices.length === 0 && (
         <View className="p-6">
@@ -58,6 +55,6 @@ export default function HomeScreen() {
           </Text>
         </View>
       )}
-    </View>
+    </ScrollView>
   );
 }
