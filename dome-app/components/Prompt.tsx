@@ -9,10 +9,16 @@ import {
 } from "react-native";
 
 export default function Prompt({
+  title,
+  placeholder,
+  defaultValue,
   visible,
   onCancel,
   onSubmit,
 }: {
+  title: string;
+  placeholder?: string;
+  defaultValue?: string;
   visible: boolean;
   onCancel: () => void;
   onSubmit: (value: string) => void;
@@ -27,8 +33,13 @@ export default function Prompt({
       }
     >
       <View className="p-5 m-2 mb-8 bg-white rounded-xl">
-        <Text className="mb-4 text-lg font-bold">Prompt</Text>
-        <TextInput autoFocus className="py-2 border-b-2 border-blue-500" />
+        <Text className="mb-4 text-lg font-bold">{title}</Text>
+        <TextInput
+          autoFocus
+          placeholder={placeholder}
+          defaultValue={defaultValue}
+          className="py-2 border-b-2 border-blue-500"
+        />
         <View className="flex flex-row mt-4">
           <TouchableOpacity className="flex-1 py-2" onPress={() => onCancel()}>
             <Text className="text-sm font-medium text-center text-blue-500 uppercase border-r border-gray-200">
