@@ -15,7 +15,7 @@ type DeviceSwitchScreenProp = StackNavigationProp<
 type DeviceScreenRouteProp = RouteProp<UserStackParamList, "DeviceSwitch">;
 
 export default function DeviceSwitchScreen() {
-  const navigate = useNavigation<DeviceSwitchScreenProp>();
+  const navigation = useNavigation<DeviceSwitchScreenProp>();
   const route = useRoute<DeviceScreenRouteProp>();
   const { id, deviceId } = route.params;
   const devices = useAppSelector((state) => state.dome.devices);
@@ -39,7 +39,7 @@ export default function DeviceSwitchScreen() {
       {/* Header */}
       <View>
         <View className="flex flex-row px-4 py-5">
-          <TouchableOpacity onPress={() => navigate.goBack()}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color="#0f172a" />
           </TouchableOpacity>
           <Text className="ml-5 text-lg font-bold text-gray-900">
@@ -72,7 +72,7 @@ export default function DeviceSwitchScreen() {
 
       <TouchableOpacity
         className="px-6 py-4"
-        onPress={() => setPromptName(true)}
+        onPress={() => navigation.navigate("RoomType")}
       >
         <Text className="text-base font-medium">Room type</Text>
         <Text className="text-sm text-gray-500">

@@ -5,7 +5,6 @@ import { Header } from "../components/Headers";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { UserStackParamList } from "../navigation/userStack";
-import ResetDomeConfirmation from "../components/ResetDomeConfirmation";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAppSelector } from "../redux/store";

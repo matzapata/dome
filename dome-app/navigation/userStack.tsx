@@ -9,6 +9,7 @@ import PeopleScreen from "../screens/People";
 import DeviceScreen from "../screens/Device";
 import DeviceSwitchScreen from "../screens/DeviceSwitch";
 import JoinDome from "../screens/JoinDome";
+import RoomType from "../screens/RoomType";
 
 export type UserStackParamList = {
   Home: undefined;
@@ -18,7 +19,7 @@ export type UserStackParamList = {
   Device: { id: string };
   DeviceSwitch: { deviceId: string; id: string };
   JoinDome: undefined;
-  InvitePeople: undefined;
+  RoomType: undefined;
 };
 
 const Stack = createStackNavigator();
@@ -58,8 +59,8 @@ export default function UserStack() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="JoinDome"
-          component={JoinDome}
+          name="RoomType"
+          component={RoomType}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
