@@ -9,6 +9,7 @@ import ResetDomeConfirmation from "../components/ResetDomeConfirmation";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAppSelector } from "../redux/store";
+import Confirm from "../components/Confirm";
 
 type SettingsScreenProp = StackNavigationProp<UserStackParamList, "Settings">;
 const auth = getAuth();
@@ -16,6 +17,7 @@ const auth = getAuth();
 export default function SettingsScreen() {
   const navigation = useNavigation<SettingsScreenProp>();
   const devices = useAppSelector((state) => state.dome.devices);
+  const [confirmResetModal, setConfirmResetModal] = React.useState(false);
 
   return (
     <View className="bg-white">
@@ -49,12 +51,25 @@ export default function SettingsScreen() {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity className="px-6 py-4" onPress={ResetDomeConfirmation}>
+      <TouchableOpacity
+        className="px-6 py-4"
+        onPress={() => setConfirmResetModal(true)}
+      >
         <Text className="text-base font-medium">Reset dome</Text>
         <Text className="text-sm text-gray-500">
           Revoke permissions and remove devices
         </Text>
       </TouchableOpacity>
+      <Confirm
+        title="Reset dome"
+        message="If you reset your dome, you and everybody at your dome will lose access to the devices. "
+        visible={confirmResetModal}
+        onCancel={() => setConfirmResetModal(false)}
+        onConfirm={() => {
+          setConfirmResetModal(false);
+          console.log("RESET DOME");
+        }}
+      />
 
       <View className="h-1 bg-gray-200" />
 
