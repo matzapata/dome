@@ -26,7 +26,10 @@ export default function HomeScreen() {
           >
             <Text className="text-center text-white">Settings</Text>
           </TouchableOpacity>
-          <TouchableOpacity className="bg-[#27292D] flex-1 rounded-full py-3">
+          <TouchableOpacity
+            className="bg-[#27292D] flex-1 rounded-full py-3"
+            onPress={() => navigation.navigate("AddDevice")}
+          >
             <Text className="text-center text-white">Add device</Text>
           </TouchableOpacity>
         </View>

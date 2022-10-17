@@ -8,8 +8,8 @@ import PersonalInformationScreen from "../screens/PersonalInformation";
 import PeopleScreen from "../screens/People";
 import DeviceScreen from "../screens/Device";
 import DeviceSwitchScreen from "../screens/DeviceSwitch";
-import JoinDome from "../screens/JoinDome";
 import RoomType from "../screens/RoomType";
+import AddDevice from "../screens/AddDevice";
 
 export type UserStackParamList = {
   Home: undefined;
@@ -20,6 +20,7 @@ export type UserStackParamList = {
   DeviceSwitch: { deviceId: string; id: string };
   JoinDome: undefined;
   RoomType: undefined;
+  AddDevice: undefined;
 };
 
 const Stack = createStackNavigator();
@@ -61,6 +62,11 @@ export default function UserStack() {
         <Stack.Screen
           name="RoomType"
           component={RoomType}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AddDevice"
+          component={AddDevice}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
