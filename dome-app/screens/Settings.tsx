@@ -39,6 +39,16 @@ export default function SettingsScreen() {
         </Text>
       </TouchableOpacity>
 
+      <TouchableOpacity
+        className="px-6 py-4"
+        onPress={() => navigation.navigate("JoinDome")}
+      >
+        <Text className="text-base font-medium">Join a dome</Text>
+        <Text className="text-sm text-gray-500">
+          Join a dome to control it&apos;s devices
+        </Text>
+      </TouchableOpacity>
+
       <TouchableOpacity className="px-6 py-4" onPress={ResetDomeConfirmation}>
         <Text className="text-base font-medium">Reset dome</Text>
         <Text className="text-sm text-gray-500">

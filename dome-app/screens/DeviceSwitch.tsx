@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { Switch, Text, TouchableOpacity, View } from "react-native";
-import { Header } from "../components/Headers";
+import { Text, TouchableOpacity, View } from "react-native";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { UserStackParamList } from "../navigation/userStack";
@@ -25,7 +24,7 @@ export default function DeviceSwitchScreen() {
   const [promptName, setPromptName] = useState(false);
 
   return (
-    <View>
+    <View className="bg-white">
       <Prompt
         title="Change switch name"
         defaultValue={device?.name}
