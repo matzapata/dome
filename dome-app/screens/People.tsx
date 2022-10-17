@@ -78,8 +78,8 @@ function ShareDomeModal({
         className="flex justify-end h-full"
         style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
       >
-        <View className="p-6 m-4 bg-white rounded-2xl">
-          <Text className="text-xl font-bold text-center">
+        <View className="m-2 space-y-4 bg-white rounded-2xl">
+          <Text className="p-6 text-lg font-bold text-center text-gray-900">
             Share access to dome
           </Text>
           <View className="flex flex-row justify-center my-4">
@@ -90,11 +90,11 @@ function ShareDomeModal({
               backgroundColor="white"
             />
           </View>
-          <Text className="text-base leading-5 text-center text-gray-800">
+          <Text className="px-6 text-base leading-5 text-center text-gray-800">
             Anyone who scans this code will have access to your devices
           </Text>
           <TouchableOpacity onPress={() => setIsVisible(false)}>
-            <Text className="mt-4 text-base font-medium text-center text-blue-500">
+            <Text className="p-6 text-sm font-medium text-center text-blue-500 uppercase">
               OK
             </Text>
           </TouchableOpacity>
