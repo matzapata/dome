@@ -5,7 +5,7 @@ import { Header } from "../components/Headers";
 
 export default function JoinDome() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [scanned, setScanned] = useState(false);
+  const [scanned, setScanned] = useState(true);
   const [data, setData] = useState("");
 
   useEffect(() => {
@@ -64,25 +64,30 @@ function ConfirmationModal({
         className="flex justify-center h-full"
         style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
       >
-        <View className="p-6 m-4 bg-white rounded-2xl">
-          <Text className="text-xl font-bold">Join dome</Text>
+        <View className="m-2 bg-white rounded-2xl">
+          <Text className="p-6 text-lg font-medium text-gray-900">
+            Join dome
+          </Text>
 
-          <View className="py-4">
-            <Text className="text-base font-medium">Matias Zapata</Text>
-            <Text className="text-sm text-gray-500">matuzapata@gmail.com</Text>
-          </View>
+          <Text className="px-6 ">
+            You&apos;ll control all matuzapata@gmail.com devices but wont be
+            capable of editing settings and adding new devices
+          </Text>
 
           <View className="flex flex-row">
-            <TouchableOpacity className="flex-1" onPress={() => onCancel()}>
-              <Text className="mt-4 text-base font-medium text-center text-blue-500">
+            <TouchableOpacity
+              className="flex-1 py-6"
+              onPress={() => onCancel()}
+            >
+              <Text className="text-sm font-medium text-center text-blue-500 uppercase border-r border-gray-200">
                 CANCEL
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className="flex-1"
+              className="flex-1 py-6"
               onPress={() => onConfirmation()}
             >
-              <Text className="mt-4 text-base font-medium text-center text-blue-500">
+              <Text className="text-sm font-medium text-center text-blue-500 uppercase">
                 JOIN
               </Text>
             </TouchableOpacity>
