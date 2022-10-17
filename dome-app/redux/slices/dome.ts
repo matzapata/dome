@@ -26,82 +26,10 @@ export interface DomeState {
   devices: DomeDevice[];
 }
 
-// const initialState: DomeState = {
-//   id: null,
-//   people: [],
-//   devices: [],
-// };
-
 const initialState: DomeState = {
-  id: "dome_id",
-  people: [
-    { id: "a", name: "Juan Perez", email: "juanperez@gmail.com" },
-    { id: "b", name: "Juana Perez", email: "juanperez@gmail.com" },
-    { id: "c", name: "Gonzalo Perez", email: "juanperez@gmail.com" },
-  ],
-  devices: [
-    {
-      id: "new",
-      name: "Device",
-      switches: [
-        {
-          id: "a",
-          name: "Livingroom",
-          deviceId: "abc",
-          roomType: "Bedroom",
-          state: false,
-        },
-        {
-          id: "b",
-          name: "Bedroom",
-          deviceId: "abc",
-          roomType: "Bedroom",
-          state: false,
-        },
-      ],
-    },
-    {
-      id: "cba",
-      name: "Device",
-      switches: [
-        {
-          id: "a",
-          name: "Livingroom",
-          deviceId: "abc",
-          roomType: "Bedroom",
-          state: false,
-        },
-        {
-          id: "b",
-          name: "Bedroom",
-          deviceId: "abc",
-          roomType: "Bedroom",
-          state: false,
-        },
-        {
-          id: "c",
-          name: "Bedroom",
-          deviceId: "abc",
-          roomType: "Bedroom",
-          state: false,
-        },
-        {
-          id: "d",
-          name: "Bedroom",
-          deviceId: "abc",
-          roomType: "Bedroom",
-          state: false,
-        },
-        {
-          id: "e",
-          name: "Bedroom",
-          deviceId: "abc",
-          roomType: "Bedroom",
-          state: false,
-        },
-      ],
-    },
-  ],
+  id: null,
+  people: [],
+  devices: [],
 };
 
 export const domeSlice = createSlice({
