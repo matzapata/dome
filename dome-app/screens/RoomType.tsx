@@ -8,10 +8,10 @@ import { UserStackParamList } from "../navigation/userStack";
 
 const rooms = ["Bedroom", "Kitchen", "None"];
 
-type SettingsScreenProp = StackNavigationProp<UserStackParamList, "RoomType">;
+type RoomTypeScreenProp = StackNavigationProp<UserStackParamList, "RoomType">;
 
 export default function RoomType() {
-  const navigation = useNavigation<SettingsScreenProp>();
+  const navigation = useNavigation<RoomTypeScreenProp>();
 
   const setRoom = (room: string) => {
     console.log(room);

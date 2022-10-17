@@ -3,11 +3,23 @@ import { View, Text } from "react-native";
 import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
 import { Header } from "../components/Headers";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { UserStackParamList } from "../navigation/userStack";
 
 // const devices: any[] = [];
 const devices: any[] = ["Dome xx12", "Dome aabc"];
 
+type AddDeviceScreenProp = StackNavigationProp<UserStackParamList, "AddDevice">;
+
 export default function AddDevice() {
+  const navigation = useNavigation<AddDeviceScreenProp>();
+
+  const connectToDevice = (device: string) => {
+    console.log(`connecting to: ${device}`);
+    navigation.navigate("SetupDeviceWifiNetwork");
+  };
+
   return (
     <View className="bg-white">
       <Header title="Add a device" />
@@ -27,7 +39,10 @@ export default function AddDevice() {
         <FlatList
           data={devices}
           renderItem={({ item }) => (
-            <TouchableOpacity className="flex flex-row px-6 py-4 space-x-4">
+            <TouchableOpacity
+              className="flex flex-row px-6 py-4 space-x-4"
+              onPress={() => connectToDevice(item)}
+            >
               <MaterialCommunityIcons
                 name="lightbulb-on"
                 size={20}
