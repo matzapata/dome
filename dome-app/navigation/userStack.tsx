@@ -11,6 +11,7 @@ import DeviceSwitchScreen from "../screens/DeviceSwitch";
 import RoomType from "../screens/RoomType";
 import AddDevice from "../screens/AddDevice";
 import SetupDeviceWifiNetwork from "../screens/SetupDeviceWifiNetwork";
+import SetupDevice from "../screens/SetupDevice";
 
 export type UserStackParamList = {
   Home: undefined;
@@ -23,6 +24,7 @@ export type UserStackParamList = {
   RoomType: undefined;
   AddDevice: undefined;
   SetupDeviceWifiNetwork: undefined;
+  SetupDevice: undefined;
 };
 
 const Stack = createStackNavigator();
@@ -74,6 +76,11 @@ export default function UserStack() {
         <Stack.Screen
           name="SetupDeviceWifiNetwork"
           component={SetupDeviceWifiNetwork}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SetupDevice"
+          component={SetupDevice}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

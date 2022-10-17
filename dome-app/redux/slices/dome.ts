@@ -41,7 +41,7 @@ const initialState: DomeState = {
   ],
   devices: [
     {
-      id: "abc",
+      id: "new",
       name: "Device",
       switches: [
         {

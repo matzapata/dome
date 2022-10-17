@@ -97,7 +97,10 @@ export default function SettingsScreen() {
           )}
           keyExtractor={(d) => d.id}
         />
-        <TouchableOpacity className="flex flex-row items-center py-4">
+        <TouchableOpacity
+          className="flex flex-row items-center py-4"
+          onPress={() => navigation.navigate("AddDevice")}
+        >
           <Ionicons name="add" size={24} color="#3182CE" />
           <Text className="ml-4 font-medium text-blue-500">Add device</Text>
         </TouchableOpacity>

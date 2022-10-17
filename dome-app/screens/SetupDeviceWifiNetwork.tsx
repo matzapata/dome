@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View, Text, Modal } from "react-native";
 import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
 import { Header } from "../components/Headers";
 
@@ -14,7 +14,7 @@ const networks: any[] = ["Fibertel 123", "6B011B"];
 
 type SetupDeviceWifiNetworkScreenProp = StackNavigationProp<
   UserStackParamList,
-  "Settings"
+  "SetupDeviceWifiNetwork"
 >;
 
 export default function SetupDeviceWifiNetwork() {
@@ -22,6 +22,8 @@ export default function SetupDeviceWifiNetwork() {
   const [ssid, setSsid] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [promptPassword, setPromptPassword] = React.useState(false);
+  const [success, setSuccess] = React.useState(false);
+  const [error, setError] = React.useState(false);
 
   return (
     <View className="bg-white">
@@ -41,8 +43,11 @@ export default function SetupDeviceWifiNetwork() {
         onCancel={() => setPromptPassword(false)}
         onSubmit={(val) => {
           setPassword(val);
+          setPromptPassword(false);
+          setSuccess(true);
         }}
       />
+
       <FlatList
         data={networks}
         renderItem={({ item }) => (
@@ -58,6 +63,62 @@ export default function SetupDeviceWifiNetwork() {
           </TouchableOpacity>
         )}
       />
+      {success && <SuccessOverlay />}
+      {error && <ErrorOverlay />}
+    </View>
+  );
+}
+
+function SuccessOverlay() {
+  const navigation = useNavigation<SetupDeviceWifiNetworkScreenProp>();
+  return (
+    <View
+      className="absolute top-0 left-0 flex justify-end w-screen h-screen"
+      style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+    >
+      <View className="m-2 space-y-4 bg-white rounded-2xl">
+        <Text className="p-6 text-lg font-bold text-center text-gray-900">
+          Success
+        </Text>
+        <View className="flex flex-row justify-center my-4">
+          <Ionicons name="checkmark-circle" size={60} color="#38A169" />
+        </View>
+        <Text className="px-6 text-base leading-5 text-center text-gray-800">
+          Please reset the device and set up it&apos;s name and location.
+        </Text>
+        <TouchableOpacity onPress={() => navigation.navigate("SetupDevice")}>
+          <Text className="p-6 text-sm font-medium text-center text-blue-500 uppercase">
+            Continue
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+function ErrorOverlay() {
+  const navigation = useNavigation<SetupDeviceWifiNetworkScreenProp>();
+  return (
+    <View
+      className="absolute top-0 left-0 flex justify-end w-screen h-screen"
+      style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+    >
+      <View className="m-2 space-y-4 bg-white rounded-2xl">
+        <Text className="p-6 text-lg font-bold text-center text-gray-900">
+          Error
+        </Text>
+        <View className="flex flex-row justify-center my-4">
+          <Ionicons name="close-circle" size={50} color="#E53E3E" />
+        </View>
+        <Text className="px-6 text-base leading-5 text-center text-gray-800">
+          Please try again
+        </Text>
+        <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+          <Text className="p-6 text-sm font-medium text-center text-blue-500 uppercase">
+            Continue
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
