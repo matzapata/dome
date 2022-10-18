@@ -16,44 +16,27 @@ type AddDeviceScreenProp = StackNavigationProp<UserStackParamList, "AddDevice">;
 export default function AddDevice() {
   const navigation = useNavigation<AddDeviceScreenProp>();
 
-  const connectToDevice = (device: string) => {
-    console.log(`connecting to: ${device}`);
-    navigation.navigate("SetupDeviceWifiNetwork");
-  };
-
   return (
     <Screen>
       <View className="bg-white">
         <Header title="Add a device" />
         <View className="px-6 py-5">
           <Text>
-            Reset the device and keep the button pressed to enter setup mode
+            1. Reset the device and keep the button pressed to enter setup mode
           </Text>
         </View>
         <View className="h-1 bg-gray-200" />
-        <View>
-          <Text className="px-6 py-3 text-xs text-gray-500">
-            AVAILABLE DEVICES
+        <View className="px-6 py-5">
+          <Text>
+            2. Connect your phone to the wifi network created by the device.
+            Then press continue
           </Text>
-          {devices.length === 0 && (
-            <Text className="p-6 text-base text-gray-700">Searching...</Text>
-          )}
-          <FlatList
-            data={devices}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                className="flex flex-row px-6 py-4 space-x-4"
-                onPress={() => connectToDevice(item)}
-              >
-                <MaterialCommunityIcons
-                  name="lightbulb-on"
-                  size={20}
-                  color="#A0AEC0"
-                />
-                <Text className="text-base">{item}</Text>
-              </TouchableOpacity>
-            )}
-          />
+          <TouchableOpacity
+            onPress={() => navigation.navigate("SetupDeviceWifiNetwork")}
+            className="py-4 mt-6 mb-2 bg-black rounded-md"
+          >
+            <Text className="font-medium text-center text-white">Continue</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </Screen>
