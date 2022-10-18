@@ -1,7 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
+  deleteMember,
   fetchUserData,
   joinDome,
+  makeAdmin,
+  removeAdmin,
   updateDeviceName,
   updateSwitchName,
   updateSwitchRoom,
@@ -184,6 +187,39 @@ export const domeSlice = createSlice({
         if (s.deviceId !== deviceId || s.id !== switchId) return s;
         return { ...s, room };
       });
+    });
+
+    // Add admin permissions
+    builder.addCase(makeAdmin.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(makeAdmin.fulfilled, (state, action) => {
+      state.loading = false;
+      state.members = state.members.map((m) => {
+        if (m.id !== action.payload.uid) return m;
+        return { ...m, isAdmin: true };
+      });
+    });
+
+    // Remove admin permissions
+    builder.addCase(removeAdmin.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(removeAdmin.fulfilled, (state, action) => {
+      state.loading = false;
+      state.members = state.members.map((m) => {
+        if (m.id !== action.payload.uid) return m;
+        return { ...m, isAdmin: false };
+      });
+    });
+
+    // Delete member
+    builder.addCase(deleteMember.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(deleteMember.fulfilled, (state, action) => {
+      state.loading = false;
+      state.members = state.members.filter((m) => m.id !== action.payload.uid);
     });
   },
 });

@@ -161,3 +161,49 @@ export const joinDome = createAsyncThunk(
     return { domeId, dbPayload: { devices, members } };
   }
 );
+
+export const makeAdmin = createAsyncThunk(
+  "domeThunk/makeAdmin",
+  async ({ uid }: { uid: string }, { getState }) => {
+    const {
+      dome: { id: domeId },
+    } = getState() as { dome: DomeState };
+
+    await update(ref(db, `domes/${domeId}/members/${uid}`), {
+      isAdmin: true,
+    });
+
+    return { uid };
+  }
+);
+
+export const removeAdmin = createAsyncThunk(
+  "domeThunk/removeAdmin",
+  async ({ uid }: { uid: string }, { getState }) => {
+    const {
+      dome: { id: domeId },
+    } = getState() as { dome: DomeState };
+
+    await update(ref(db, `domes/${domeId}/members/${uid}`), {
+      isAdmin: false,
+    });
+
+    return { uid };
+  }
+);
+
+export const deleteMember = createAsyncThunk(
+  "domeThunk/deleteMember",
+  async ({ uid }: { uid: string }, { getState }) => {
+    const {
+      dome: { id: domeId },
+    } = getState() as { dome: DomeState };
+
+    await update(ref(db, `users/${uid}`), { dome: "" });
+    await update(ref(db, `domes/${domeId}/members`), {
+      [uid]: null,
+    });
+
+    return { uid };
+  }
+);
