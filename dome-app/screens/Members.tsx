@@ -4,9 +4,11 @@ import { Header } from "../components/Headers";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAppSelector } from "../redux/store";
 import QRCode from "react-native-qrcode-svg";
+import Toast from "react-native-root-toast";
 
 export default function MembersScreen() {
   const members = useAppSelector((state) => state.dome.members);
+  const isAdmin = useAppSelector((state) => state.dome.user.isAdmin);
   const [shareDomeModalVisible, setShareDomeModalVisible] =
     React.useState(false);
 
@@ -40,7 +42,11 @@ export default function MembersScreen() {
 
       <TouchableOpacity
         className="flex flex-row items-center px-6 py-4"
-        onPress={() => setShareDomeModalVisible(true)}
+        onPress={() => {
+          if (!isAdmin) {
+            Toast.show("Only admin can edit device name ");
+          } else setShareDomeModalVisible(true);
+        }}
       >
         <Ionicons name="add" size={24} color="#3182CE" />
         <Text className="ml-4 font-medium text-blue-500">Add member</Text>

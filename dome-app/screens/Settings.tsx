@@ -15,6 +15,8 @@ export default function SettingsScreen() {
   const auth = getAuth();
   const navigation = useNavigation<SettingsScreenProp>();
   const devices = useAppSelector((state) => state.dome.devices);
+  const isAdmin = useAppSelector((state) => state.dome.user.isAdmin);
+  const domeId = useAppSelector((state) => state.dome.id);
 
   return (
     <View className="bg-white">
@@ -38,15 +40,17 @@ export default function SettingsScreen() {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        className="px-6 py-4"
-        onPress={() => navigation.navigate("JoinDome")}
-      >
-        <Text className="text-base font-medium">Join a dome</Text>
-        <Text className="text-sm text-gray-500">
-          Join a dome to control it&apos;s devices
-        </Text>
-      </TouchableOpacity>
+      {domeId === "" && (
+        <TouchableOpacity
+          className="px-6 py-4"
+          onPress={() => navigation.navigate("JoinDome")}
+        >
+          <Text className="text-base font-medium">Join a dome</Text>
+          <Text className="text-sm text-gray-500">
+            Join a dome to control it&apos;s devices
+          </Text>
+        </TouchableOpacity>
+      )}
 
       <View className="h-1 bg-gray-200" />
 
@@ -77,7 +81,7 @@ export default function SettingsScreen() {
           )}
           keyExtractor={(d) => d.id}
         />
-        {devices.length === 0 && (
+        {devices.length === 0 && isAdmin && (
           <TouchableOpacity
             className="flex flex-row items-center py-4"
             onPress={() => navigation.navigate("AddDevice")}

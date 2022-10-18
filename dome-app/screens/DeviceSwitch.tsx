@@ -9,6 +9,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { updateSwitchName } from "../redux/slices/domeThunk";
 import { Switch } from "../components/DeviceSwitch";
 import { DomeSwitch } from "../redux/slices/dome";
+import Toast from "react-native-root-toast";
 
 type DeviceSwitchScreenProp = StackNavigationProp<
   UserStackParamList,
@@ -22,6 +23,7 @@ export default function DeviceSwitchScreen() {
   const route = useRoute<DeviceScreenRouteProp>();
   const devices = useAppSelector((state) => state.dome.devices);
   const switches = useAppSelector((state) => state.dome.switches);
+  const isAdmin = useAppSelector((state) => state.dome.user.isAdmin);
   const [promptName, setPromptName] = useState(false);
 
   const { switchId, deviceId } = route.params;
@@ -64,7 +66,11 @@ export default function DeviceSwitchScreen() {
 
       <TouchableOpacity
         className="px-6 py-4"
-        onPress={() => setPromptName(true)}
+        onPress={() => {
+          if (!isAdmin) {
+            Toast.show("Only admin can edit switch name ");
+          } else setPromptName(true);
+        }}
       >
         <Text className="text-base font-medium">Name of the switch</Text>
         <Text className="text-sm text-gray-500">{devSwitch?.name || ""}</Text>
@@ -72,12 +78,16 @@ export default function DeviceSwitchScreen() {
 
       <TouchableOpacity
         className="px-6 py-4"
-        onPress={() =>
-          navigation.navigate("RoomType", {
-            deviceId,
-            switchId,
-          })
-        }
+        onPress={() => {
+          if (!isAdmin) {
+            Toast.show("Only admin can update switch room");
+          } else {
+            navigation.navigate("RoomType", {
+              deviceId,
+              switchId,
+            });
+          }
+        }}
       >
         <Text className="text-base font-medium">Room type</Text>
         <Text className="text-sm text-gray-500">{devSwitch?.room || ""}</Text>

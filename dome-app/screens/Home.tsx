@@ -6,6 +6,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { useAppSelector } from "../redux/store";
 import SwitchCard from "../components/SwitchCard";
 import { ScrollView } from "react-native-gesture-handler";
+import Toast from "react-native-root-toast";
 
 type HomeScreenProp = StackNavigationProp<UserStackParamList, "Home">;
 
@@ -14,6 +15,7 @@ export default function HomeScreen() {
   const devices = useAppSelector((state) => state.dome.devices);
   const switches = useAppSelector((state) => state.dome.switches);
   const username = useAppSelector((state) => state.dome.user.name);
+  const isAdmin = useAppSelector((state) => state.dome.user.isAdmin);
 
   return (
     <ScrollView className="bg-white">
@@ -30,7 +32,11 @@ export default function HomeScreen() {
           </TouchableOpacity>
           <TouchableOpacity
             className="bg-[#27292D] flex-1 rounded-full py-3"
-            onPress={() => navigation.navigate("AddDevice")}
+            onPress={() => {
+              if (!isAdmin) {
+                Toast.show("Only admin can add devices");
+              } else navigation.navigate("AddDevice");
+            }}
           >
             <Text className="text-center text-white">Add device</Text>
           </TouchableOpacity>

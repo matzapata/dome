@@ -9,6 +9,7 @@ import { DomeDevice, DomeSwitch } from "../redux/slices/dome";
 import Prompt from "../components/Prompt";
 import { updateDeviceName } from "../redux/slices/domeThunk";
 import { Switch } from "../components/DeviceSwitch";
+import Toast from "react-native-root-toast";
 
 type DeviceScreenProp = StackNavigationProp<UserStackParamList, "Device">;
 type DeviceScreenRouteProp = RouteProp<UserStackParamList, "Device">;
@@ -38,6 +39,7 @@ export default function DeviceScreen() {
   const route = useRoute<DeviceScreenRouteProp>();
   const devices = useAppSelector((state) => state.dome.devices);
   const switches = useAppSelector((state) => state.dome.switches);
+  const isAdmin = useAppSelector((state) => state.dome.user.isAdmin);
   const [promptName, setPromptName] = useState(false);
 
   const { deviceId } = route.params;
@@ -60,7 +62,11 @@ export default function DeviceScreen() {
 
       <TouchableOpacity
         className="px-6 py-4"
-        onPress={() => setPromptName(true)}
+        onPress={() => {
+          if (!isAdmin) {
+            Toast.show("Only admin can edit device name ");
+          } else setPromptName(true);
+        }}
       >
         <Text className="text-base font-medium">Name of the device</Text>
         <Text className="text-sm text-gray-500">{device.name}</Text>
@@ -76,7 +82,11 @@ export default function DeviceScreen() {
 
       <TouchableOpacity
         className="px-6 py-4"
-        onPress={() => console.log("Prompt delete device confirmation")}
+        onPress={() => {
+          if (!isAdmin) {
+            Toast.show("Only admin can delete device");
+          }
+        }}
       >
         <Text className="text-base font-medium text-red-700">
           Delete device
