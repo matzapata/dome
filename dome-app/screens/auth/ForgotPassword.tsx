@@ -8,10 +8,13 @@ import {
   TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
+  Alert,
 } from "react-native";
 import { AuthStackParamList } from "../../navigation/authStack";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 
+const auth = getAuth();
 type ForgotPasswordScreenProp = StackNavigationProp<
   AuthStackParamList,
   "ForgotPassword"
@@ -19,6 +22,17 @@ type ForgotPasswordScreenProp = StackNavigationProp<
 
 export default function ForgotPassword() {
   const navigation = useNavigation<ForgotPasswordScreenProp>();
+  const [email, setEmail] = React.useState("");
+
+  const resetPassword = async () => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+      Alert.alert("Reset email sent");
+      navigation.navigate("SignIn");
+    } catch (error: any) {
+      Alert.alert("Sign in error", error.code);
+    }
+  };
 
   return (
     <KeyboardAvoidingView>
@@ -32,9 +46,13 @@ export default function ForgotPassword() {
           <TextInput
             className="px-4 py-3 mb-4 bg-gray-200 rounded-md"
             placeholder="Email"
+            onChangeText={(text) => setEmail(text)}
           />
 
-          <TouchableOpacity className="py-4 mb-2 bg-black rounded-md">
+          <TouchableOpacity
+            className="py-4 mb-2 bg-black rounded-md"
+            onPress={() => resetPassword()}
+          >
             <Text className="font-medium text-center text-white">
               Reset password
             </Text>
