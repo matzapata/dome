@@ -45,13 +45,13 @@ export default function SignIn() {
   return (
     <Screen>
       <KeyboardAvoidingView>
-        <View className="flex flex-col justify-between h-full ">
+        <View className="flex flex-col h-full ">
           <View className="w-full px-4 pt-20 pb-4">
             <Text className="text-3xl font-extrabold">Welcome</Text>
             <Text className="text-gray-500">to your dome</Text>
           </View>
 
-          <View className="px-4">
+          <View className="px-4 mt-8">
             <TextInput
               className="px-4 py-3 mb-4 bg-gray-200 rounded-md"
               placeholder="Email"
@@ -80,25 +80,6 @@ export default function SignIn() {
                 Don&apos;t have an account?{" "}
                 <Text className="font-bold">Sign up</Text>
               </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View className="p-4">
-            <View className="flex-row items-center">
-              <View className="flex-1 h-[1px] bg-gray-400" />
-              <View>
-                <Text className="text-center w-[100px] text-gray-500">
-                  or login with
-                </Text>
-              </View>
-              <View className="flex-1 h-[1px] bg-gray-400" />
-            </View>
-            <TouchableOpacity className="flex flex-row items-center justify-center p-3 mt-4 border border-gray-400 rounded-md">
-              <Image
-                className="w-4 h-4 mr-2"
-                source={require("../../assets/google-icon.png")}
-              />
-              <Text className="font-semibold text-gray-600">Google</Text>
             </TouchableOpacity>
           </View>
         </View>
