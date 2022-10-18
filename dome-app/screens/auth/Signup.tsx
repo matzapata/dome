@@ -48,16 +48,12 @@ export default function SignUp() {
         state.email,
         state.password
       );
-      await set(ref(db, "users/" + user.user.uid), {
+      await set(ref(db, `users/${user.user.uid}`), {
         name: state.name,
         dome: "",
       });
     } catch (error: any) {
-      Alert.alert("Sign up error", error);
-      setState({
-        ...state,
-        error: error,
-      });
+      Alert.alert("Sign up error", error.code);
     }
   }
 

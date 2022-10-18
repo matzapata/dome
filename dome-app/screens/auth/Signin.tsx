@@ -31,21 +31,14 @@ export default function SignIn() {
 
   async function onSubmit() {
     if (state.email === "" || state.password === "") {
-      setState({
-        ...state,
-        error: "Email and password are mandatory.",
-      });
+      Alert.alert("Sign in error", "Email and password are mandatory.");
       return;
     }
 
     try {
       await signInWithEmailAndPassword(auth, state.email, state.password);
     } catch (error: any) {
-      Alert.alert("Sign in error", error);
-      setState({
-        ...state,
-        error: error.message,
-      });
+      Alert.alert("Sign in error", error.code);
     }
   }
 

@@ -7,7 +7,6 @@ import { UserStackParamList } from "../navigation/userStack";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAppSelector } from "../redux/store";
-import Confirm from "../components/Confirm";
 import { getAuth, signOut } from "firebase/auth";
 
 type SettingsScreenProp = StackNavigationProp<UserStackParamList, "Settings">;
@@ -16,7 +15,6 @@ export default function SettingsScreen() {
   const auth = getAuth();
   const navigation = useNavigation<SettingsScreenProp>();
   const devices = useAppSelector((state) => state.dome.devices);
-  const [confirmResetModal, setConfirmResetModal] = React.useState(false);
 
   return (
     <View className="bg-white">
