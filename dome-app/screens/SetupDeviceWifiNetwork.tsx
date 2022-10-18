@@ -8,6 +8,7 @@ import { UserStackParamList } from "../navigation/userStack";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import Prompt from "../components/Prompt";
+import Screen from "../components/Screen";
 
 // const networks: any[] = [];
 const networks: any[] = ["Fibertel 123", "6B011B"];
@@ -26,46 +27,48 @@ export default function SetupDeviceWifiNetwork() {
   const [error, setError] = React.useState(false);
 
   return (
-    <View className="bg-white">
-      <Header title="Setup wifi connection" />
+    <Screen>
+      <View className="bg-white">
+        <Header title="Setup wifi connection" />
 
-      <View className="h-1 bg-gray-200" />
+        <View className="h-1 bg-gray-200" />
 
-      <Text className="px-6 py-3 text-xs text-gray-500">
-        AVAILABLE NETWORKS
-      </Text>
-      {networks.length === 0 && (
-        <Text className="p-6 text-base text-gray-700">Searching...</Text>
-      )}
-      <Prompt
-        title="Network password"
-        visible={promptPassword}
-        onCancel={() => setPromptPassword(false)}
-        onSubmit={(val) => {
-          setPassword(val);
-          setPromptPassword(false);
-          setSuccess(true);
-        }}
-      />
-
-      <FlatList
-        data={networks}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            className="flex flex-row px-6 py-4 space-x-4"
-            onPress={() => {
-              setSsid(item);
-              setPromptPassword(true);
-            }}
-          >
-            <Ionicons name="wifi" size={20} color="#A0AEC0" />
-            <Text className="text-base">{item}</Text>
-          </TouchableOpacity>
+        <Text className="px-6 py-3 text-xs text-gray-500">
+          AVAILABLE NETWORKS
+        </Text>
+        {networks.length === 0 && (
+          <Text className="p-6 text-base text-gray-700">Searching...</Text>
         )}
-      />
-      {success && <SuccessOverlay />}
-      {error && <ErrorOverlay />}
-    </View>
+        <Prompt
+          title="Network password"
+          visible={promptPassword}
+          onCancel={() => setPromptPassword(false)}
+          onSubmit={(val) => {
+            setPassword(val);
+            setPromptPassword(false);
+            setSuccess(true);
+          }}
+        />
+
+        <FlatList
+          data={networks}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              className="flex flex-row px-6 py-4 space-x-4"
+              onPress={() => {
+                setSsid(item);
+                setPromptPassword(true);
+              }}
+            >
+              <Ionicons name="wifi" size={20} color="#A0AEC0" />
+              <Text className="text-base">{item}</Text>
+            </TouchableOpacity>
+          )}
+        />
+        {success && <SuccessOverlay />}
+        {error && <ErrorOverlay />}
+      </View>
+    </Screen>
   );
 }
 

@@ -14,6 +14,7 @@ import { useAppDispatch } from "../redux/store";
 import { joinDome } from "../redux/slices/domeThunk";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { UserStackParamList } from "../navigation/userStack";
+import Screen from "../components/Screen";
 
 type JoinDomeScreenProp = StackNavigationProp<UserStackParamList, "Home">;
 
@@ -50,30 +51,34 @@ export default function JoinDome() {
     );
   } else
     return (
-      <View className="flex flex-col justify-start flex-1">
-        <Header title="Join a dome" />
+      <Screen>
+        <View className="flex flex-col justify-start flex-1">
+          <Header title="Join a dome" />
 
-        <BarCodeScanner
-          className="-z-10"
-          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-          style={StyleSheet.absoluteFill}
-        />
-        <ConfirmationModal
-          isVisible={scanned}
-          ownerName={data.split("-")[1]}
-          onConfirmation={async () => {
-            setScanned(false);
-            try {
-              await dispatch(joinDome({ domeId: data.split("-")[0] })).unwrap();
-              Alert.alert("Successfully joined dome");
-              navigation.navigate("Home");
-            } catch (e) {
-              Alert.alert("Error joining dome", "Please try again");
-            }
-          }}
-          onCancel={() => setScanned(false)}
-        />
-      </View>
+          <BarCodeScanner
+            className="-z-10"
+            onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+            style={StyleSheet.absoluteFill}
+          />
+          <ConfirmationModal
+            isVisible={scanned}
+            ownerName={data.split("-")[1]}
+            onConfirmation={async () => {
+              setScanned(false);
+              try {
+                await dispatch(
+                  joinDome({ domeId: data.split("-")[0] })
+                ).unwrap();
+                Alert.alert("Successfully joined dome");
+                navigation.navigate("Home");
+              } catch (e) {
+                Alert.alert("Error joining dome", "Please try again");
+              }
+            }}
+            onCancel={() => setScanned(false)}
+          />
+        </View>
+      </Screen>
     );
 }
 

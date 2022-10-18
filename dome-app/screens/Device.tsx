@@ -10,6 +10,7 @@ import Prompt from "../components/Prompt";
 import { updateDeviceName } from "../redux/slices/domeThunk";
 import { Switch } from "../components/DeviceSwitch";
 import Toast from "react-native-root-toast";
+import Screen from "../components/Screen";
 
 type DeviceScreenProp = StackNavigationProp<UserStackParamList, "Device">;
 type DeviceScreenRouteProp = RouteProp<UserStackParamList, "Device">;
@@ -46,52 +47,54 @@ export default function DeviceScreen() {
   const device = devices.find((d) => d.id === deviceId) as DomeDevice;
 
   return (
-    <View className="bg-white">
-      <Prompt
-        title="Rename device"
-        defaultValue={device.name}
-        visible={promptName}
-        onSubmit={(name) => {
-          dispatch(updateDeviceName({ deviceId, name }));
-          setPromptName(false);
-        }}
-        onCancel={() => setPromptName(false)}
-      />
+    <Screen>
+      <View className="bg-white">
+        <Prompt
+          title="Rename device"
+          defaultValue={device.name}
+          visible={promptName}
+          onSubmit={(name) => {
+            dispatch(updateDeviceName({ deviceId, name }));
+            setPromptName(false);
+          }}
+          onCancel={() => setPromptName(false)}
+        />
 
-      <Header title={device.name} />
+        <Header title={device.name} />
 
-      <TouchableOpacity
-        className="px-6 py-4"
-        onPress={() => {
-          if (!isAdmin) {
-            Toast.show("Only admin can edit device name ");
-          } else setPromptName(true);
-        }}
-      >
-        <Text className="text-base font-medium">Name of the device</Text>
-        <Text className="text-sm text-gray-500">{device.name}</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          className="px-6 py-4"
+          onPress={() => {
+            if (!isAdmin) {
+              Toast.show("Only admin can edit device name ");
+            } else setPromptName(true);
+          }}
+        >
+          <Text className="text-base font-medium">Name of the device</Text>
+          <Text className="text-sm text-gray-500">{device.name}</Text>
+        </TouchableOpacity>
 
-      <View className="py-2 border-t border-b border-gray-200">
-        {switches
-          .filter((s) => s.deviceId === deviceId)
-          .map((d) => (
-            <MinimalisticSwitchCard key={d.id} domeSwitch={d} />
-          ))}
+        <View className="py-2 border-t border-b border-gray-200">
+          {switches
+            .filter((s) => s.deviceId === deviceId)
+            .map((d) => (
+              <MinimalisticSwitchCard key={d.id} domeSwitch={d} />
+            ))}
+        </View>
+
+        <TouchableOpacity
+          className="px-6 py-4"
+          onPress={() => {
+            if (!isAdmin) {
+              Toast.show("Only admin can delete device");
+            }
+          }}
+        >
+          <Text className="text-base font-medium text-red-700">
+            Delete device
+          </Text>
+        </TouchableOpacity>
       </View>
-
-      <TouchableOpacity
-        className="px-6 py-4"
-        onPress={() => {
-          if (!isAdmin) {
-            Toast.show("Only admin can delete device");
-          }
-        }}
-      >
-        <Text className="text-base font-medium text-red-700">
-          Delete device
-        </Text>
-      </TouchableOpacity>
-    </View>
+    </Screen>
   );
 }

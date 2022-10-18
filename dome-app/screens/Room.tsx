@@ -4,6 +4,7 @@ import React from "react";
 import { View, FlatList, Text, TouchableOpacity } from "react-native";
 
 import { Header } from "../components/Headers";
+import Screen from "../components/Screen";
 import { UserStackParamList } from "../navigation/userStack";
 import { updateSwitchRoom } from "../redux/slices/domeThunk";
 import { useAppDispatch } from "../redux/store";
@@ -25,17 +26,22 @@ export default function RoomType() {
   };
 
   return (
-    <View className="bg-white">
-      <Header title="Room" />
+    <Screen>
+      <View className="bg-white">
+        <Header title="Room" />
 
-      <FlatList
-        data={rooms}
-        renderItem={({ item }) => (
-          <TouchableOpacity className="px-6 py-4" onPress={() => setRoom(item)}>
-            <Text className="text-base">{item}</Text>
-          </TouchableOpacity>
-        )}
-      />
-    </View>
+        <FlatList
+          data={rooms}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              className="px-6 py-4"
+              onPress={() => setRoom(item)}
+            >
+              <Text className="text-base">{item}</Text>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
+    </Screen>
   );
 }
