@@ -8,6 +8,7 @@ import Prompt from "../components/Prompt";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { updateSwitchName } from "../redux/slices/domeThunk";
 import { Switch } from "../components/DeviceSwitch";
+import { DomeSwitch } from "../redux/slices/dome";
 
 type DeviceSwitchScreenProp = StackNavigationProp<
   UserStackParamList,
@@ -25,7 +26,7 @@ export default function DeviceSwitchScreen() {
 
   const { switchId, deviceId } = route.params;
   const device = devices.find((d) => d.id === deviceId);
-  const devSwitch = switches.find((s) => s.id === switchId);
+  const devSwitch = switches.find((s) => s.id === switchId) as DomeSwitch;
 
   return (
     <View className="bg-white">
@@ -56,7 +57,7 @@ export default function DeviceSwitchScreen() {
           ) : (
             <Text className="text-sm text-gray-600 uppercase">inactive</Text>
           )}
-          <Switch devSwitch={devSwitch} />
+          <Switch switchId={devSwitch.id} deviceId={devSwitch.deviceId} />
         </View>
         <View className="h-1 bg-gray-200" />
       </View>

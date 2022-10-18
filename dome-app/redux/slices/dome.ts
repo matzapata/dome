@@ -64,7 +64,7 @@ export const domeSlice = createSlice({
       state,
       action: PayloadAction<{
         deviceId: string;
-        switchId: string;
+        switchId: string | number;
         state: boolean;
       }>
     ) => {

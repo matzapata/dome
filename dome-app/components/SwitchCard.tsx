@@ -46,7 +46,7 @@ export default function SwitchCard({ domeSwitch }: { domeSwitch: DomeSwitch }) {
           {domeSwitch.name}
         </Text>
       </TouchableOpacity>
-      <Switch devSwitch={domeSwitch} />
+      <Switch switchId={domeSwitch.id} deviceId={domeSwitch.deviceId} />
     </View>
   );
 }

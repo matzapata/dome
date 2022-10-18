@@ -12,7 +12,7 @@ export default function RootNavigation() {
   const dispatch = useAppDispatch();
 
   React.useEffect(() => {
-    if (user) dispatch(fetchUserData({ uid: user.uid }));
+    if (user !== null) dispatch(fetchUserData({ uid: user.uid }));
     else dispatch(cleanStore());
   }, [user]);
 

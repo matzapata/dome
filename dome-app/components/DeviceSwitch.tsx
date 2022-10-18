@@ -2,31 +2,37 @@ import { getDatabase, onValue, ref } from "firebase/database";
 import React, { useEffect, useState } from "react";
 import ToggleSwitch from "toggle-switch-react-native";
 import { DomeSwitch, updateSwitchState } from "../redux/slices/dome";
-import { setSwitchStatus } from "../redux/slices/domeThunk";
+import { setSwitchState } from "../redux/slices/domeThunk";
 import { useAppDispatch, useAppSelector } from "../redux/store";
 
 const db = getDatabase();
 
-export const Switch = ({ devSwitch }: { devSwitch?: DomeSwitch }) => {
-  if (devSwitch === undefined) return null;
-
+export const Switch = ({
+  switchId,
+  deviceId,
+}: {
+  switchId: string | number;
+  deviceId: string;
+}) => {
   const dispatch = useAppDispatch();
-  const [val, setVal] = useState(!!devSwitch.state);
-  const domeId = useAppSelector((state) => state.dome.domeId);
+  const domeId = useAppSelector((state) => state.dome.id);
+  const switches = useAppSelector((state) => state.dome.switches);
+  const devSwitch = switches.find(
+    (s) => s.id === switchId && s.deviceId === deviceId
+  ) as DomeSwitch;
 
   useEffect(() => {
     const switchRef = ref(
       db,
-      `domes/${domeId}/devices/${devSwitch.deviceId}/switches_pinout_states/${devSwitch.id}`
+      `domes/${domeId}/devices/${deviceId}/switches/${switchId}/state`
     );
     const unsubscribe = onValue(switchRef, (snapshot) => {
-      console.log("snapshot", snapshot);
-      setVal(!!snapshot);
+      console.log("snapshot", snapshot.val());
       dispatch(
         updateSwitchState({
-          deviceId: devSwitch.deviceId,
-          switchId: devSwitch.id,
-          state: !!snapshot,
+          deviceId,
+          switchId,
+          state: snapshot.val(),
         })
       );
     });
@@ -39,11 +45,10 @@ export const Switch = ({ devSwitch }: { devSwitch?: DomeSwitch }) => {
       onColor="black"
       offColor="#CBD5E0"
       onToggle={(isOn) => {
-        // setVal(isOn);
         dispatch(
-          setSwitchStatus({
-            deviceId: devSwitch.deviceId,
-            switchId: devSwitch.id,
+          setSwitchState({
+            deviceId,
+            switchId,
             state: isOn,
           })
         );

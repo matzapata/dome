@@ -116,10 +116,10 @@ export const updateSwitchRoom = createAsyncThunk(
   }
 );
 
-export const setSwitchStatus = createAsyncThunk(
-  "domeThunk/setSwitchStatus",
+export const setSwitchState = createAsyncThunk(
+  "domeThunk/setSwitchState",
   async (
-    payload: { deviceId: string; switchId: string; state: boolean },
+    payload: { deviceId: string; switchId: string | number; state: boolean },
     { getState }
   ) => {
     const state = getState() as { dome: DomeState };
@@ -129,11 +129,9 @@ export const setSwitchStatus = createAsyncThunk(
     await update(
       ref(
         db,
-        `domes/${domeId}/devices/${payload.deviceId}/switches_pinout_states`
+        `domes/${domeId}/devices/${payload.deviceId}/switches/${payload.switchId}`
       ),
-      {
-        [payload.switchId]: payload.state ? 1 : 0,
-      }
+      { state: payload.state }
     );
 
     return { ...payload };
