@@ -44,6 +44,7 @@ export interface DomeState {
   members: DomeMember[];
   devices: DomeDevice[];
   switches: DomeSwitch[];
+  loading: boolean;
 }
 
 const initialState: DomeState = {
@@ -57,6 +58,7 @@ const initialState: DomeState = {
   members: [],
   devices: [],
   switches: [],
+  loading: false,
 };
 
 export const domeSlice = createSlice({
