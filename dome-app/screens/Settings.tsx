@@ -1,19 +1,19 @@
 import React from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
-import { getAuth, signOut } from "firebase/auth";
 import { Header } from "../components/Headers";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { UserStackParamList } from "../navigation/userStack";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useAppSelector } from "../redux/store";
+import { useAppDispatch, useAppSelector } from "../redux/store";
 import Confirm from "../components/Confirm";
+import { logOut } from "../redux/slices/domeThunk";
 
 type SettingsScreenProp = StackNavigationProp<UserStackParamList, "Settings">;
-const auth = getAuth();
 
 export default function SettingsScreen() {
+  const dispatch = useAppDispatch();
   const navigation = useNavigation<SettingsScreenProp>();
   const devices = useAppSelector((state) => state.dome.devices);
   const [confirmResetModal, setConfirmResetModal] = React.useState(false);
@@ -108,7 +108,10 @@ export default function SettingsScreen() {
 
       <View className="h-1 bg-gray-200" />
 
-      <TouchableOpacity className="px-6 py-4" onPress={() => signOut(auth)}>
+      <TouchableOpacity
+        className="px-6 py-4"
+        onPress={() => dispatch(logOut())}
+      >
         <Text className="text-base font-medium text-blue-500">Logout</Text>
       </TouchableOpacity>
     </View>

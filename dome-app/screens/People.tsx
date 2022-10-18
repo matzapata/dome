@@ -3,16 +3,10 @@ import { FlatList, Text, TouchableOpacity, View, Modal } from "react-native";
 import { Header } from "../components/Headers";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAppSelector } from "../redux/store";
-import { useNavigation } from "@react-navigation/native";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { UserStackParamList } from "../navigation/userStack";
 import QRCode from "react-native-qrcode-svg";
 
-type PeopleScreenProp = StackNavigationProp<UserStackParamList, "People">;
-
 export default function PeopleScreen() {
-  const navigation = useNavigation<PeopleScreenProp>();
-  const people = useAppSelector((state) => state.dome.people);
+  const people = useAppSelector((state) => state.dome.members);
   const [shareDomeModalVisible, setShareDomeModalVisible] =
     React.useState(false);
 
@@ -66,6 +60,9 @@ function ShareDomeModal({
   isVisible: boolean;
   setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+  const domeId = useAppSelector((state) => state.dome.domeId);
+  const userName = useAppSelector((state) => state.dome.user.name);
+
   return (
     <Modal
       transparent={true}
@@ -84,7 +81,7 @@ function ShareDomeModal({
           </Text>
           <View className="flex flex-row justify-center my-4">
             <QRCode
-              value={"dome_id:user_id"}
+              value={`${domeId}-${userName}`}
               size={200}
               color="black"
               backgroundColor="white"

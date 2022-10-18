@@ -3,16 +3,16 @@ import { Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { DomeSwitch } from "../redux/slices/dome";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import ToggleSwitch from "toggle-switch-react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { UserStackParamList } from "../navigation/userStack";
+import { Switch } from "./DeviceSwitch";
 
 type HomeScreenProp = StackNavigationProp<UserStackParamList, "Home">;
 
 export default function SwitchCard({ domeSwitch }: { domeSwitch: DomeSwitch }) {
-  const [isEnabled, setIsEnabled] = useState(domeSwitch.state);
   const navigation = useNavigation<HomeScreenProp>();
+  const isEnabled = domeSwitch.state;
 
   return (
     <View
@@ -46,12 +46,7 @@ export default function SwitchCard({ domeSwitch }: { domeSwitch: DomeSwitch }) {
           {domeSwitch.name}
         </Text>
       </TouchableOpacity>
-      <ToggleSwitch
-        isOn={isEnabled}
-        onColor="black"
-        offColor="#CBD5E0"
-        onToggle={(isOn) => setIsEnabled(isOn)}
-      />
+      <Switch devSwitch={domeSwitch} />
     </View>
   );
 }

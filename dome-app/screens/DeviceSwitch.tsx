@@ -3,10 +3,11 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { UserStackParamList } from "../navigation/userStack";
-import { useAppSelector } from "../redux/store";
+import { useAppDispatch, useAppSelector } from "../redux/store";
 import Prompt from "../components/Prompt";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import ToggleSwitch from "toggle-switch-react-native";
+import { updateSwitchName } from "../redux/slices/domeThunk";
+import { Switch } from "../components/DeviceSwitch";
 
 type DeviceSwitchScreenProp = StackNavigationProp<
   UserStackParamList,
@@ -22,16 +23,19 @@ export default function DeviceSwitchScreen() {
   const device = devices.find((d) => d.id === deviceId);
   const devSwitch = device?.switches.find((s) => s.id === id);
   const [promptName, setPromptName] = useState(false);
+  const dispatch = useAppDispatch();
 
   return (
     <View className="bg-white">
       <Prompt
         title="Change switch name"
-        defaultValue={device?.name}
+        defaultValue={devSwitch?.name}
         visible={promptName}
         onSubmit={(val) => {
           setPromptName(false);
-          console.log(val);
+          dispatch(
+            updateSwitchName({ deviceId: deviceId, switchId: id, name: val })
+          );
         }}
         onCancel={() => setPromptName(false)}
       />
@@ -52,12 +56,7 @@ export default function DeviceSwitchScreen() {
           ) : (
             <Text className="text-sm text-gray-600 uppercase">inactive</Text>
           )}
-          <ToggleSwitch
-            isOn={!!devSwitch?.state}
-            onColor="black"
-            offColor="#CBD5E0"
-            onToggle={(isOn) => console.log("toggle")}
-          />
+          <Switch devSwitch={devSwitch} />
         </View>
         <View className="h-1 bg-gray-200" />
       </View>
@@ -72,7 +71,12 @@ export default function DeviceSwitchScreen() {
 
       <TouchableOpacity
         className="px-6 py-4"
-        onPress={() => navigation.navigate("RoomType")}
+        onPress={() =>
+          navigation.navigate("RoomType", {
+            deviceId,
+            switchId: id,
+          })
+        }
       >
         <Text className="text-base font-medium">Room type</Text>
         <Text className="text-sm text-gray-500">

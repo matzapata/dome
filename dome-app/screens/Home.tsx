@@ -12,11 +12,12 @@ type HomeScreenProp = StackNavigationProp<UserStackParamList, "Home">;
 export default function HomeScreen() {
   const navigation = useNavigation<HomeScreenProp>();
   const devices = useAppSelector((state) => state.dome.devices);
+  const username = useAppSelector((state) => state.dome.user.name);
 
   return (
     <ScrollView className="bg-white">
       <View className="p-6 bg-[#0F0F0F]">
-        <Text className="text-2xl font-bold text-white">Hi Matias 👋</Text>
+        <Text className="text-2xl font-bold text-white">Hi {username} 👋</Text>
         <Text className="text-white">Welcome to your dome</Text>
 
         <View className="flex flex-row mt-4 space-x-6">

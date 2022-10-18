@@ -9,14 +9,16 @@ import {
   TouchableOpacity,
   Image,
   KeyboardAvoidingView,
+  Alert,
 } from "react-native";
 import { AuthStackParamList } from "../../navigation/authStack";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { useAppDispatch } from "../../redux/store";
+import { signIn } from "../../redux/slices/domeThunk";
 
 type SignInScreenProp = StackNavigationProp<AuthStackParamList, "SignIn">;
-const auth = getAuth();
 
 export default function SignIn() {
+  const dispatch = useAppDispatch();
   const navigation = useNavigation<SignInScreenProp>();
   const [state, setState] = useState<{
     email: string;
@@ -28,7 +30,7 @@ export default function SignIn() {
     error: "",
   });
 
-  async function signIn() {
+  async function onSubmit() {
     if (state.email === "" || state.password === "") {
       setState({
         ...state,
@@ -38,9 +40,9 @@ export default function SignIn() {
     }
 
     try {
-      await signInWithEmailAndPassword(auth, state.email, state.password);
-      navigation.navigate("SignIn");
+      await dispatch(signIn({ email: state.email, password: state.password }));
     } catch (error: any) {
+      Alert.alert("Sign in error", error);
       setState({
         ...state,
         error: error.message,
@@ -51,43 +53,41 @@ export default function SignIn() {
   return (
     <KeyboardAvoidingView>
       <View className="flex flex-col justify-between h-full ">
-        <View>
-          <View className="w-full px-4 my-24">
-            <Text className="text-3xl font-extrabold">Welcome</Text>
-            <Text className="text-gray-500">to your dome</Text>
-          </View>
+        <View className="w-full px-4 pt-20 pb-4">
+          <Text className="text-3xl font-extrabold">Welcome</Text>
+          <Text className="text-gray-500">to your dome</Text>
+        </View>
 
-          <View className="px-4">
-            <TextInput
-              className="px-4 py-3 mb-4 bg-gray-200 rounded-md"
-              placeholder="Email"
-              onChangeText={(text) => setState({ ...state, email: text })}
-            />
-            <TextInput
-              secureTextEntry={true}
-              className="px-4 py-3 mb-2 bg-gray-200 rounded-md"
-              placeholder="Password"
-              onChangeText={(text) => setState({ ...state, password: text })}
-            />
-            <TouchableOpacity
-              onPress={() => navigation.navigate("ForgotPassword")}
-            >
-              <Text className="text-right">Forgot password?</Text>
-            </TouchableOpacity>
+        <View className="px-4">
+          <TextInput
+            className="px-4 py-3 mb-4 bg-gray-200 rounded-md"
+            placeholder="Email"
+            onChangeText={(text) => setState({ ...state, email: text })}
+          />
+          <TextInput
+            secureTextEntry={true}
+            className="px-4 py-3 mb-2 bg-gray-200 rounded-md"
+            placeholder="Password"
+            onChangeText={(text) => setState({ ...state, password: text })}
+          />
+          <TouchableOpacity
+            onPress={() => navigation.navigate("ForgotPassword")}
+          >
+            <Text className="text-right">Forgot password?</Text>
+          </TouchableOpacity>
 
-            <TouchableOpacity
-              className="py-4 mt-6 mb-2 bg-black rounded-md"
-              onPress={signIn}
-            >
-              <Text className="font-medium text-center text-white">Login</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
-              <Text className="text-center">
-                Don&apos;t have an account?{" "}
-                <Text className="font-bold">Sign up</Text>
-              </Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            className="py-4 mt-6 mb-2 bg-black rounded-md"
+            onPress={onSubmit}
+          >
+            <Text className="font-medium text-center text-white">Login</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
+            <Text className="text-center">
+              Don&apos;t have an account?{" "}
+              <Text className="font-bold">Sign up</Text>
+            </Text>
+          </TouchableOpacity>
         </View>
 
         <View className="p-4">

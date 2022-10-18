@@ -4,10 +4,11 @@ import { Header } from "../components/Headers";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { UserStackParamList } from "../navigation/userStack";
-import { useAppSelector } from "../redux/store";
+import { useAppDispatch, useAppSelector } from "../redux/store";
 import { DomeSwitch } from "../redux/slices/dome";
 import Prompt from "../components/Prompt";
 import ToggleSwitch from "toggle-switch-react-native";
+import { updateDeviceName } from "../redux/slices/domeThunk";
 
 type DeviceScreenProp = StackNavigationProp<UserStackParamList, "Device">;
 type DeviceScreenRouteProp = RouteProp<UserStackParamList, "Device">;
@@ -39,6 +40,7 @@ function MinimalisticSwitchCard({ domeSwitch }: { domeSwitch: DomeSwitch }) {
 }
 
 export default function DeviceScreen() {
+  const dispatch = useAppDispatch();
   const route = useRoute<DeviceScreenRouteProp>();
   const { id } = route.params;
   const devices = useAppSelector((state) => state.dome.devices);
@@ -52,8 +54,8 @@ export default function DeviceScreen() {
         defaultValue={device?.name}
         visible={promptName}
         onSubmit={(val) => {
+          dispatch(updateDeviceName({ deviceId: id, name: val }));
           setPromptName(false);
-          console.log(val);
         }}
         onCancel={() => setPromptName(false)}
       />

@@ -21,7 +21,7 @@ export type UserStackParamList = {
   Device: { id: string };
   DeviceSwitch: { deviceId: string; id: string };
   JoinDome: undefined;
-  RoomType: undefined;
+  RoomType: { deviceId: string; switchId: string };
   AddDevice: undefined;
   SetupDeviceWifiNetwork: undefined;
   SetupDevice: undefined;

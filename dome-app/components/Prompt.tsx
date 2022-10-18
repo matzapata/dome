@@ -23,6 +23,8 @@ export default function Prompt({
   onCancel: () => void;
   onSubmit: (value: string) => void;
 }) {
+  const [state, setState] = React.useState(defaultValue ? defaultValue : "");
+
   if (!visible) return null;
   return (
     <KeyboardAvoidingView
@@ -37,7 +39,8 @@ export default function Prompt({
         <TextInput
           autoFocus
           placeholder={placeholder}
-          defaultValue={defaultValue}
+          value={state}
+          onChangeText={(text) => setState(text)}
           className="mx-6 border-b-2 border-blue-500"
         />
         <View className="flex flex-row">
@@ -48,7 +51,7 @@ export default function Prompt({
           </TouchableOpacity>
           <TouchableOpacity
             className="flex-1 py-6"
-            onPress={() => onSubmit("val")}
+            onPress={() => onSubmit(state)}
           >
             <Text className="text-sm font-medium text-center text-blue-500 uppercase">
               Submit

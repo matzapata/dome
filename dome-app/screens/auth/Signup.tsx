@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { StatusBar } from "expo-status-bar";
 import {
   Text,
   View,
@@ -9,14 +8,16 @@ import {
   TouchableOpacity,
   Image,
   KeyboardAvoidingView,
+  Alert,
 } from "react-native";
 import { AuthStackParamList } from "../../navigation/authStack";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { useAppDispatch } from "../../redux/store";
+import { signUp } from "../../redux/slices/domeThunk";
 
 type SignUpScreenProp = StackNavigationProp<AuthStackParamList, "SignUp">;
-const auth = getAuth();
 
 export default function SignUp() {
+  const dispatch = useAppDispatch();
   const navigation = useNavigation<SignUpScreenProp>();
   const [state, setState] = useState<{
     email: string;
@@ -30,21 +31,29 @@ export default function SignUp() {
     error: "",
   });
 
-  async function signUp() {
-    if (state.email === "" || state.password === "") {
+  async function signUpUser() {
+    if (state.email === "" || state.password === "" || state.name === "") {
+      Alert.alert("Sign up error", "All fields are mandatory.");
       setState({
         ...state,
-        error: "Email and password are mandatory.",
+        error: "All fields are mandatory.",
       });
       return;
     }
 
     try {
-      await createUserWithEmailAndPassword(auth, state.email, state.password);
+      await dispatch(
+        signUp({
+          email: state.email,
+          password: state.password,
+          name: state.name,
+        })
+      ).unwrap();
     } catch (error: any) {
+      Alert.alert("Sign up error", error);
       setState({
         ...state,
-        error: error.message,
+        error: error,
       });
     }
   }
@@ -52,12 +61,12 @@ export default function SignUp() {
   return (
     <KeyboardAvoidingView>
       <View className="flex flex-col justify-between h-full ">
-        <View>
-          <View className="w-full px-4 my-24">
-            <Text className="text-3xl font-extrabold">Sign up</Text>
-            <Text className="text-gray-500">to your dome</Text>
-          </View>
+        <View className="w-full px-4 pt-20 pb-4">
+          <Text className="text-3xl font-extrabold">Sign up</Text>
+          <Text className="text-gray-500">to your dome</Text>
+        </View>
 
+        <View>
           <View className="px-4">
             <TextInput
               className="px-4 py-3 mb-4 bg-gray-200 rounded-md"
@@ -78,7 +87,7 @@ export default function SignUp() {
 
             <TouchableOpacity
               className="py-4 mt-6 mb-2 bg-black rounded-md"
-              onPress={signUp}
+              onPress={signUpUser}
             >
               <Text className="font-medium text-center text-white">
                 Continue
@@ -112,8 +121,6 @@ export default function SignUp() {
           </TouchableOpacity>
         </View>
       </View>
-
-      <StatusBar style="auto" />
     </KeyboardAvoidingView>
   );
 }
