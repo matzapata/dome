@@ -1,7 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { getAuth } from "firebase/auth";
 import { get, getDatabase, ref, update } from "firebase/database";
 import { DomeState } from "./dome";
 
+const auth = getAuth();
 const db = getDatabase();
 
 export const fetchUserData = createAsyncThunk(
@@ -20,6 +22,7 @@ export const fetchUserData = createAsyncThunk(
       userUid: payload.uid,
       domeId: dome,
       userName: name,
+      email: auth.currentUser?.email,
       dbPayload: { devices, members },
     };
   }

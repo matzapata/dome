@@ -65,6 +65,9 @@ export const domeSlice = createSlice({
   name: "dome",
   initialState,
   reducers: {
+    setLoading: (state, action) => {
+      state.loading = action.payload;
+    },
     updateSwitchState: (
       state,
       action: PayloadAction<{
@@ -95,24 +98,32 @@ export const domeSlice = createSlice({
   },
   extraReducers: (builder) => {
     // Fetch user data
+    builder.addCase(fetchUserData.pending, (state) => {
+      state.loading = true;
+    });
     builder.addCase(fetchUserData.fulfilled, (state, action) => {
-      const { domeId, userName, userUid } = action.payload;
+      const { domeId, userName, userUid, email } = action.payload;
       const devices = extractDevicesFromDbPayload(action.payload.dbPayload);
       const members = extractMembersFromDbPayload(action.payload.dbPayload);
       const switches = extractSwitchesFromDbPayload(action.payload.dbPayload);
 
       state.id = domeId;
-      state.user.name = userName;
       state.user.uid = userUid;
+      state.user.name = userName;
+      state.user.email = email ? email : "";
       state.user.isAdmin =
         members.find((m: DomeMember) => m.id === state.user.uid) !== undefined;
 
       state.devices = devices;
       state.members = members;
       state.switches = switches;
+      state.loading = false;
     });
 
     // Join dome
+    builder.addCase(joinDome.pending, (state) => {
+      state.loading = true;
+    });
     builder.addCase(joinDome.fulfilled, (state, action) => {
       const { domeId } = action.payload;
       const devices = extractDevicesFromDbPayload(action.payload.dbPayload);
@@ -126,15 +137,24 @@ export const domeSlice = createSlice({
       state.devices = devices;
       state.members = members;
       state.switches = switches;
+      state.loading = false;
     });
 
     // Update username
+    builder.addCase(updateUserName.pending, (state) => {
+      state.loading = true;
+    });
     builder.addCase(updateUserName.fulfilled, (state, action) => {
       state.user.name = action.payload?.name;
+      state.loading = false;
     });
 
     // Update device name
+    builder.addCase(updateDeviceName.pending, (state) => {
+      state.loading = true;
+    });
     builder.addCase(updateDeviceName.fulfilled, (state, action) => {
+      state.loading = false;
       state.devices = state.devices.map((d) => {
         if (d.id !== action.payload.deviceId) return d;
         return { ...d, name: action.payload.name };
@@ -142,15 +162,23 @@ export const domeSlice = createSlice({
     });
 
     // Update switch name
+    builder.addCase(updateSwitchName.pending, (state) => {
+      state.loading = true;
+    });
     builder.addCase(updateSwitchName.fulfilled, (state, action) => {
       const { switchId, deviceId, name } = action.payload;
+      state.loading = false;
       state.switches = state.switches.map((s) => {
         if (s.id !== switchId || s.deviceId !== deviceId) return s;
         return { ...s, name };
       });
     });
     // update switch room type
+    builder.addCase(updateSwitchRoom.pending, (state) => {
+      state.loading = true;
+    });
     builder.addCase(updateSwitchRoom.fulfilled, (state, action) => {
+      state.loading = false;
       state.switches = state.switches.map((s) => {
         const { deviceId, switchId, room } = action.payload;
         if (s.deviceId !== deviceId || s.id !== switchId) return s;
@@ -160,6 +188,6 @@ export const domeSlice = createSlice({
   },
 });
 
-export const { updateSwitchState, cleanStore } = domeSlice.actions;
+export const { updateSwitchState, cleanStore, setLoading } = domeSlice.actions;
 
 export default domeSlice.reducer;

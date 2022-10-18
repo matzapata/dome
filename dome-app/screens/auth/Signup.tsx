@@ -6,7 +6,6 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  Image,
   KeyboardAvoidingView,
   Alert,
 } from "react-native";
@@ -14,12 +13,15 @@ import { AuthStackParamList } from "../../navigation/authStack";
 import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
 import { getDatabase, ref, set } from "firebase/database";
 import Screen from "../../components/Screen";
+import { useDispatch } from "react-redux";
+import { setLoading } from "../../redux/slices/dome";
 
 type SignUpScreenProp = StackNavigationProp<AuthStackParamList, "SignUp">;
 
 export default function SignUp() {
   const auth = getAuth();
   const db = getDatabase();
+  const dispatch = useDispatch();
   const navigation = useNavigation<SignUpScreenProp>();
   const [state, setState] = useState<{
     email: string;
@@ -44,6 +46,7 @@ export default function SignUp() {
     }
 
     try {
+      dispatch(setLoading(true));
       const user = await createUserWithEmailAndPassword(
         auth,
         state.email,
@@ -55,6 +58,8 @@ export default function SignUp() {
       });
     } catch (error: any) {
       Alert.alert("Sign up error", error.code);
+    } finally {
+      dispatch(setLoading(true));
     }
   }
 

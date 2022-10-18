@@ -13,6 +13,8 @@ import { AuthStackParamList } from "../../navigation/authStack";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import Screen from "../../components/Screen";
+import { useAppDispatch } from "../../redux/store";
+import { setLoading } from "../../redux/slices/dome";
 
 const auth = getAuth();
 type ForgotPasswordScreenProp = StackNavigationProp<
@@ -21,16 +23,20 @@ type ForgotPasswordScreenProp = StackNavigationProp<
 >;
 
 export default function ForgotPassword() {
+  const dispatch = useAppDispatch();
   const navigation = useNavigation<ForgotPasswordScreenProp>();
   const [email, setEmail] = React.useState("");
 
   const resetPassword = async () => {
     try {
+      dispatch(setLoading(true));
       await sendPasswordResetEmail(auth, email);
       Alert.alert("Reset email sent");
       navigation.navigate("SignIn");
     } catch (error: any) {
       Alert.alert("Sign in error", error.code);
+    } finally {
+      dispatch(setLoading(false));
     }
   };
 

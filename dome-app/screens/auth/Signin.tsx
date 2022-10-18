@@ -6,18 +6,20 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  Image,
   KeyboardAvoidingView,
   Alert,
 } from "react-native";
 import { AuthStackParamList } from "../../navigation/authStack";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import Screen from "../../components/Screen";
+import { useAppDispatch } from "../../redux/store";
+import { setLoading } from "../../redux/slices/dome";
 
 type SignInScreenProp = StackNavigationProp<AuthStackParamList, "SignIn">;
 
 export default function SignIn() {
   const auth = getAuth();
+  const dispatch = useAppDispatch();
   const navigation = useNavigation<SignInScreenProp>();
   const [state, setState] = useState<{
     email: string;
@@ -36,9 +38,12 @@ export default function SignIn() {
     }
 
     try {
+      dispatch(setLoading(true));
       await signInWithEmailAndPassword(auth, state.email, state.password);
     } catch (error: any) {
       Alert.alert("Sign in error", error.code);
+    } finally {
+      dispatch(setLoading(false));
     }
   }
 
