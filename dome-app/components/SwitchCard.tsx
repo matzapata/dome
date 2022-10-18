@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { DomeSwitch } from "../redux/slices/dome";
@@ -26,7 +26,7 @@ export default function SwitchCard({ domeSwitch }: { domeSwitch: DomeSwitch }) {
         className="flex flex-row items-center"
         onPress={() =>
           navigation.navigate("DeviceSwitch", {
-            id: domeSwitch.id,
+            switchId: domeSwitch.id,
             deviceId: domeSwitch.deviceId,
           })
         }

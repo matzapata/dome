@@ -16,26 +16,26 @@ type DeviceSwitchScreenProp = StackNavigationProp<
 type DeviceScreenRouteProp = RouteProp<UserStackParamList, "DeviceSwitch">;
 
 export default function DeviceSwitchScreen() {
+  const dispatch = useAppDispatch();
   const navigation = useNavigation<DeviceSwitchScreenProp>();
   const route = useRoute<DeviceScreenRouteProp>();
-  const { id, deviceId } = route.params;
   const devices = useAppSelector((state) => state.dome.devices);
-  const device = devices.find((d) => d.id === deviceId);
-  const devSwitch = device?.switches.find((s) => s.id === id);
+  const switches = useAppSelector((state) => state.dome.switches);
   const [promptName, setPromptName] = useState(false);
-  const dispatch = useAppDispatch();
+
+  const { switchId, deviceId } = route.params;
+  const device = devices.find((d) => d.id === deviceId);
+  const devSwitch = switches.find((s) => s.id === switchId);
 
   return (
     <View className="bg-white">
       <Prompt
-        title="Change switch name"
+        title="Update switch name"
         defaultValue={devSwitch?.name}
         visible={promptName}
-        onSubmit={(val) => {
+        onSubmit={(name) => {
           setPromptName(false);
-          dispatch(
-            updateSwitchName({ deviceId: deviceId, switchId: id, name: val })
-          );
+          dispatch(updateSwitchName({ deviceId, switchId, name }));
         }}
         onCancel={() => setPromptName(false)}
       />
@@ -74,14 +74,12 @@ export default function DeviceSwitchScreen() {
         onPress={() =>
           navigation.navigate("RoomType", {
             deviceId,
-            switchId: id,
+            switchId,
           })
         }
       >
         <Text className="text-base font-medium">Room type</Text>
-        <Text className="text-sm text-gray-500">
-          {devSwitch?.roomType || ""}
-        </Text>
+        <Text className="text-sm text-gray-500">{devSwitch?.room || ""}</Text>
       </TouchableOpacity>
 
       <View className="px-6 py-4">

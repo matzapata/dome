@@ -12,13 +12,12 @@ import {
   Alert,
 } from "react-native";
 import { AuthStackParamList } from "../../navigation/authStack";
-import { useAppDispatch } from "../../redux/store";
-import { signIn } from "../../redux/slices/domeThunk";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 type SignInScreenProp = StackNavigationProp<AuthStackParamList, "SignIn">;
 
 export default function SignIn() {
-  const dispatch = useAppDispatch();
+  const auth = getAuth();
   const navigation = useNavigation<SignInScreenProp>();
   const [state, setState] = useState<{
     email: string;
@@ -40,7 +39,7 @@ export default function SignIn() {
     }
 
     try {
-      await dispatch(signIn({ email: state.email, password: state.password }));
+      await signInWithEmailAndPassword(auth, state.email, state.password);
     } catch (error: any) {
       Alert.alert("Sign in error", error);
       setState({

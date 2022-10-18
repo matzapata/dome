@@ -12,6 +12,7 @@ type HomeScreenProp = StackNavigationProp<UserStackParamList, "Home">;
 export default function HomeScreen() {
   const navigation = useNavigation<HomeScreenProp>();
   const devices = useAppSelector((state) => state.dome.devices);
+  const switches = useAppSelector((state) => state.dome.switches);
   const username = useAppSelector((state) => state.dome.user.name);
 
   return (
@@ -42,9 +43,11 @@ export default function HomeScreen() {
             <Text className="mb-2 text-xs font-medium text-gray-500 uppercase">
               {d.name}
             </Text>
-            {d.switches.map((s) => (
-              <SwitchCard domeSwitch={s} key={s.id} />
-            ))}
+            {switches
+              .filter((s) => s.deviceId === d.id)
+              .map((s) => (
+                <SwitchCard domeSwitch={s} key={s.id} />
+              ))}
           </View>
         ))}
       </View>

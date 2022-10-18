@@ -6,14 +6,14 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { UserStackParamList } from "../navigation/userStack";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useAppDispatch, useAppSelector } from "../redux/store";
+import { useAppSelector } from "../redux/store";
 import Confirm from "../components/Confirm";
-import { logOut } from "../redux/slices/domeThunk";
+import { getAuth, signOut } from "firebase/auth";
 
 type SettingsScreenProp = StackNavigationProp<UserStackParamList, "Settings">;
 
 export default function SettingsScreen() {
-  const dispatch = useAppDispatch();
+  const auth = getAuth();
   const navigation = useNavigation<SettingsScreenProp>();
   const devices = useAppSelector((state) => state.dome.devices);
   const [confirmResetModal, setConfirmResetModal] = React.useState(false);
@@ -32,11 +32,11 @@ export default function SettingsScreen() {
 
       <TouchableOpacity
         className="px-6 py-4"
-        onPress={() => navigation.navigate("People")}
+        onPress={() => navigation.navigate("Members")}
       >
-        <Text className="text-base font-medium">People</Text>
+        <Text className="text-base font-medium">Members</Text>
         <Text className="text-sm text-gray-500">
-          Add or remove people from your dome
+          Add or remove members from your dome
         </Text>
       </TouchableOpacity>
 
@@ -78,7 +78,9 @@ export default function SettingsScreen() {
           data={devices}
           renderItem={({ item }) => (
             <TouchableOpacity
-              onPress={() => navigation.navigate("Device", { id: item.id })}
+              onPress={() =>
+                navigation.navigate("Device", { deviceId: item.id })
+              }
               className="flex flex-row justify-between py-4"
             >
               <View className="flex flex-row items-center">
@@ -108,10 +110,7 @@ export default function SettingsScreen() {
 
       <View className="h-1 bg-gray-200" />
 
-      <TouchableOpacity
-        className="px-6 py-4"
-        onPress={() => dispatch(logOut())}
-      >
+      <TouchableOpacity className="px-6 py-4" onPress={() => signOut(auth)}>
         <Text className="text-base font-medium text-blue-500">Logout</Text>
       </TouchableOpacity>
     </View>

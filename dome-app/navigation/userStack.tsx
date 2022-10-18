@@ -5,10 +5,10 @@ import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from "../screens/Home";
 import SettingsScreen from "../screens/Settings";
 import PersonalInformationScreen from "../screens/PersonalInformation";
-import PeopleScreen from "../screens/People";
+import MembersScreen from "../screens/Members";
 import DeviceScreen from "../screens/Device";
 import DeviceSwitchScreen from "../screens/DeviceSwitch";
-import RoomType from "../screens/RoomType";
+import RoomType from "../screens/Room";
 import AddDevice from "../screens/AddDevice";
 import SetupDeviceWifiNetwork from "../screens/SetupDeviceWifiNetwork";
 import SetupDevice from "../screens/SetupDevice";
@@ -17,9 +17,9 @@ export type UserStackParamList = {
   Home: undefined;
   Settings: undefined;
   PersonalInformation: undefined;
-  People: undefined;
-  Device: { id: string };
-  DeviceSwitch: { deviceId: string; id: string };
+  Members: undefined;
+  Device: { deviceId: string };
+  DeviceSwitch: { deviceId: string; switchId: string };
   JoinDome: undefined;
   RoomType: { deviceId: string; switchId: string };
   AddDevice: undefined;
@@ -49,8 +49,8 @@ export default function UserStack() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="People"
-          component={PeopleScreen}
+          name="Members"
+          component={MembersScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen

@@ -11,13 +11,14 @@ import {
   Alert,
 } from "react-native";
 import { AuthStackParamList } from "../../navigation/authStack";
-import { useAppDispatch } from "../../redux/store";
-import { signUp } from "../../redux/slices/domeThunk";
+import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import { getDatabase, ref, set } from "firebase/database";
 
 type SignUpScreenProp = StackNavigationProp<AuthStackParamList, "SignUp">;
 
 export default function SignUp() {
-  const dispatch = useAppDispatch();
+  const auth = getAuth();
+  const db = getDatabase();
   const navigation = useNavigation<SignUpScreenProp>();
   const [state, setState] = useState<{
     email: string;
@@ -42,13 +43,15 @@ export default function SignUp() {
     }
 
     try {
-      await dispatch(
-        signUp({
-          email: state.email,
-          password: state.password,
-          name: state.name,
-        })
-      ).unwrap();
+      const user = await createUserWithEmailAndPassword(
+        auth,
+        state.email,
+        state.password
+      );
+      await set(ref(db, "users/" + user.user.uid), {
+        name: state.name,
+        dome: "",
+      });
     } catch (error: any) {
       Alert.alert("Sign up error", error);
       setState({

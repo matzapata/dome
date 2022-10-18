@@ -1,88 +1,37 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import {
-  createUserWithEmailAndPassword,
-  getAuth,
-  signInWithEmailAndPassword,
-  signOut,
-} from "firebase/auth";
-import { get, getDatabase, ref, set, update } from "firebase/database";
+import { get, getDatabase, ref, update } from "firebase/database";
 import { DomeState } from "./dome";
 
-const auth = getAuth();
 const db = getDatabase();
 
-export const signUp = createAsyncThunk(
-  "domeThunk/signUp",
-  async (
-    payload: {
-      email: string;
-      password: string;
-      name: string;
-    },
-    { rejectWithValue }
-  ) => {
-    try {
-      const user = await createUserWithEmailAndPassword(
-        auth,
-        payload.email,
-        payload.password
-      );
-      await set(ref(db, "users/" + user.user.uid), {
-        name: payload.name,
-        dome: "",
-      });
-      return { uid: user.user.uid, name: payload.name };
-    } catch (e: any) {
-      return rejectWithValue(e.code);
-    }
-  }
-);
-
-export const signIn = createAsyncThunk(
-  "domeThunk/signIn",
-  async (
-    payload: {
-      email: string;
-      password: string;
-    },
-    { rejectWithValue }
-  ) => {
-    try {
-      await signInWithEmailAndPassword(auth, payload.email, payload.password);
-      return { uid: auth.currentUser?.uid };
-    } catch (e: any) {
-      return rejectWithValue(e.code);
-    }
-  }
-);
-
-export const logOut = createAsyncThunk("domeThunk/signOut", async () => {
-  await signOut(auth);
-});
-
-export const getUserData = createAsyncThunk(
+export const fetchUserData = createAsyncThunk(
   "domeThunk/getUserData",
   async (payload: { uid: string }) => {
     const user = await get(ref(db, "users/" + payload.uid));
     if (!user.exists()) throw new Error("Non existent user");
 
     const { name, dome } = user.val();
-    if (dome === "") return { userUid: payload.uid, name };
+    if (dome === "") return { userUid: payload.uid, userName: name };
 
     const domeData = await get(ref(db, "domes/" + dome));
     if (!domeData.exists()) throw new Error("Non existent dome");
     const { devices, members } = domeData.val();
-    return { userUid: payload.uid, dome, name, devices, members };
+    return {
+      userUid: payload.uid,
+      domeId: dome,
+      userName: name,
+      dbPayload: { devices, members },
+    };
   }
 );
 
 export const updateUserName = createAsyncThunk(
   "domeThunk/updateUserName",
-  async (payload: { name: string }) => {
-    const userId = auth.currentUser?.uid;
-    if (!userId) throw new Error("No authenticated user");
+  async (payload: { name: string }, { getState }) => {
+    const state = getState() as { dome: DomeState };
+    if (!state.dome.user.uid) throw new Error("No authenticated user");
 
-    await update(ref(db, "users/" + userId), {
+    await update(ref(db, `users/${state.dome.user.uid}`), {
       name: payload.name,
     });
 
@@ -96,7 +45,7 @@ export const updateDeviceName = createAsyncThunk(
     const state = getState() as { dome: DomeState };
 
     const userId = state.dome.user.uid;
-    const domeId = state.dome.domeId;
+    const domeId = state.dome.id;
     if (!userId) throw new Error("Missing user id");
     if (!domeId) throw new Error("Missing dome id");
 
@@ -117,7 +66,7 @@ export const updateSwitchName = createAsyncThunk(
     const state = getState() as { dome: DomeState };
 
     const userId = state.dome.user.uid;
-    const domeId = state.dome.domeId;
+    const domeId = state.dome.id;
     if (!userId) throw new Error("Missing user id");
     if (!domeId) throw new Error("Missing dome id");
 
@@ -139,16 +88,15 @@ export const updateSwitchName = createAsyncThunk(
   }
 );
 
-export const updateSwitchRoomType = createAsyncThunk(
-  "domeThunk/updateSwitchRoomType",
+export const updateSwitchRoom = createAsyncThunk(
+  "domeThunk/updateSwitchRoom",
   async (
-    payload: { deviceId: string; switchId: string; roomType: string },
+    payload: { deviceId: string; switchId: string; room: string },
     { getState }
   ) => {
     const state = getState() as { dome: DomeState };
-
     const userId = state.dome.user.uid;
-    const domeId = state.dome.domeId;
+    const domeId = state.dome.id;
     if (!userId) throw new Error("Missing user id");
     if (!domeId) throw new Error("Missing dome id");
 
@@ -157,15 +105,13 @@ export const updateSwitchRoomType = createAsyncThunk(
         db,
         `domes/${domeId}/devices/${payload.deviceId}/switches/${payload.switchId}`
       ),
-      {
-        roomType: payload.roomType,
-      }
+      { roomType: payload.room }
     );
 
     return {
       deviceId: payload.deviceId,
       switchId: payload.switchId,
-      roomType: payload.roomType,
+      room: payload.room,
     };
   }
 );
@@ -177,7 +123,7 @@ export const setSwitchStatus = createAsyncThunk(
     { getState }
   ) => {
     const state = getState() as { dome: DomeState };
-    const domeId = state.dome.domeId;
+    const domeId = state.dome.id;
     if (domeId === null) throw new Error("Dome id is null");
 
     await update(

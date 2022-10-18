@@ -22,7 +22,7 @@ function MinimalisticSwitchCard({ domeSwitch }: { domeSwitch: DomeSwitch }) {
       <TouchableOpacity
         onPress={() =>
           navigation.navigate("DeviceSwitch", {
-            id: domeSwitch.id,
+            switchId: domeSwitch.id,
             deviceId: domeSwitch.deviceId,
           })
         }
@@ -42,10 +42,12 @@ function MinimalisticSwitchCard({ domeSwitch }: { domeSwitch: DomeSwitch }) {
 export default function DeviceScreen() {
   const dispatch = useAppDispatch();
   const route = useRoute<DeviceScreenRouteProp>();
-  const { id } = route.params;
   const devices = useAppSelector((state) => state.dome.devices);
-  const device = devices.find((d) => d.id === id);
+  const switches = useAppSelector((state) => state.dome.switches);
   const [promptName, setPromptName] = useState(false);
+
+  const { deviceId } = route.params;
+  const device = devices.find((d) => d.id === deviceId);
 
   return (
     <View className="bg-white">
@@ -53,8 +55,8 @@ export default function DeviceScreen() {
         title="Rename device"
         defaultValue={device?.name}
         visible={promptName}
-        onSubmit={(val) => {
-          dispatch(updateDeviceName({ deviceId: id, name: val }));
+        onSubmit={(name) => {
+          dispatch(updateDeviceName({ deviceId, name }));
           setPromptName(false);
         }}
         onCancel={() => setPromptName(false)}
@@ -71,9 +73,11 @@ export default function DeviceScreen() {
       </TouchableOpacity>
 
       <View className="py-2 border-t border-b border-gray-200">
-        {device?.switches.map((d) => (
-          <MinimalisticSwitchCard key={d.id} domeSwitch={d} />
-        ))}
+        {switches
+          .filter((s) => s.deviceId === deviceId)
+          .map((d) => (
+            <MinimalisticSwitchCard key={d.id} domeSwitch={d} />
+          ))}
       </View>
 
       <TouchableOpacity

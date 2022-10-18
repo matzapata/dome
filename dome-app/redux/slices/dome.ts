@@ -1,14 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
-  getUserData,
-  logOut,
-  signIn,
-  signUp,
+  fetchUserData,
   updateDeviceName,
   updateSwitchName,
-  updateSwitchRoomType,
+  updateSwitchRoom,
   updateUserName,
 } from "./domeThunk";
+import {
+  extractDevicesFromDbPayload,
+  extractMembersFromDbPayload,
+  extractSwitchesFromDbPayload,
+} from "./domeUtils";
 
 export interface DomeMember {
   id: string;
@@ -18,9 +20,9 @@ export interface DomeMember {
 }
 
 export interface DomeSwitch {
-  id: string; // pinout
+  id: string; // id represents board pinout
   name: string;
-  roomType: string;
+  room: string;
   state: boolean;
   deviceId: string;
 }
@@ -28,25 +30,30 @@ export interface DomeSwitch {
 export interface DomeDevice {
   id: string;
   name: string;
-  switches: DomeSwitch[];
 }
 
 export interface DomeState {
+  id: string | null; // id of the dome
   user: {
-    uid: string | undefined | null;
+    uid: string | null;
     name: string;
     isAdmin: boolean;
   };
-  domeId: string | null;
   members: DomeMember[];
   devices: DomeDevice[];
+  switches: DomeSwitch[];
 }
 
 const initialState: DomeState = {
-  user: { uid: null, name: "", isAdmin: false },
-  domeId: null,
+  id: null,
+  user: {
+    uid: null,
+    name: "",
+    isAdmin: false,
+  },
   members: [],
   devices: [],
+  switches: [],
 };
 
 export const domeSlice = createSlice({
@@ -61,84 +68,43 @@ export const domeSlice = createSlice({
         state: boolean;
       }>
     ) => {
-      state.devices = state.devices.map((d) => {
-        if (d.id !== action.payload.deviceId) return d;
-        return {
-          ...d,
-          switches: d.switches.map((s) => {
-            if (s.id !== action.payload.switchId) return s;
-            return {
-              ...s,
-              state: action.payload.state,
-            };
-          }),
-        };
+      state.switches = state.switches.map((s) => {
+        if (
+          s.id === action.payload.switchId &&
+          s.deviceId === action.payload.deviceId
+        ) {
+          return {
+            ...s,
+            state: action.payload.state,
+          };
+        } else return s;
       });
+    },
+    cleanStore: (state) => {
+      state.id = initialState.id;
+      state.user = initialState.user;
+      state.members = initialState.members;
+      state.devices = initialState.devices;
+      state.switches = initialState.switches;
     },
   },
   extraReducers: (builder) => {
-    // Signup
-    builder.addCase(signUp.fulfilled, (state, action) => {
-      state.user.uid = action.payload.uid;
-      state.user.name = action.payload.name;
-    });
-    builder.addCase(signUp.rejected, (state) => {
-      state.user.uid = "";
-      state.user.name = "";
-    });
+    // Fetch user data
+    builder.addCase(fetchUserData.fulfilled, (state, action) => {
+      const { domeId, userName, userUid } = action.payload;
+      const devices = extractDevicesFromDbPayload(action.payload.dbPayload);
+      const members = extractMembersFromDbPayload(action.payload.dbPayload);
+      const switches = extractSwitchesFromDbPayload(action.payload.dbPayload);
 
-    // Signin
-    builder.addCase(signIn.fulfilled, (state, action) => {
-      state.user.uid = action.payload.uid;
-    });
-    builder.addCase(signIn.rejected, (state) => {
-      state.user.uid = "";
-    });
+      state.id = domeId;
+      state.user.name = userName;
+      state.user.uid = userUid;
+      state.user.isAdmin =
+        members.find((m: DomeMember) => m.id === state.user.uid) !== undefined;
 
-    // Logout
-    builder.addCase(logOut.fulfilled, (state) => {
-      state.user = initialState.user;
-      state.domeId = initialState.domeId;
-      state.members = initialState.members;
-      state.devices = initialState.devices;
-    });
-
-    // Get user data
-    builder.addCase(getUserData.fulfilled, (state, action) => {
-      const members: DomeMember[] = Object.keys(action.payload.members).map(
-        (memberId) => ({
-          id: memberId,
-          email: action.payload.members[memberId].email,
-          name: action.payload.members[memberId].name,
-          isAdmin: action.payload.members[memberId].isAdmin,
-        })
-      );
-      const devices: DomeDevice[] = Object.keys(action.payload.devices).map(
-        (deviceId) => {
-          const device = action.payload.devices[deviceId];
-          return {
-            id: deviceId,
-            name: device.name,
-            switches: Object.keys(device.switches).map((switchId) => {
-              return {
-                id: switchId,
-                name: device.switches[switchId].name,
-                deviceId: deviceId,
-                roomType: device.switches[switchId].roomType,
-                state: device.switches_pinout_states[switchId],
-              };
-            }),
-          };
-        }
-      );
-
-      state.domeId = action.payload.dome;
-      state.user.name = action.payload.name;
-      state.user.uid = action.payload.userUid;
       state.devices = devices;
       state.members = members;
-      state.user.isAdmin =
-        members.find((m) => m.id === state.user.uid) !== undefined;
+      state.switches = switches;
     });
 
     // Update username
@@ -149,55 +115,30 @@ export const domeSlice = createSlice({
     // Update device name
     builder.addCase(updateDeviceName.fulfilled, (state, action) => {
       state.devices = state.devices.map((d) => {
-        if (d.id === action.payload.deviceId) {
-          return {
-            ...d,
-            name: action.payload.name,
-          };
-        } else return d;
+        if (d.id !== action.payload.deviceId) return d;
+        return { ...d, name: action.payload.name };
       });
     });
 
     // Update switch name
     builder.addCase(updateSwitchName.fulfilled, (state, action) => {
-      state.devices = state.devices.map((d) => {
-        if (d.id !== action.payload.deviceId) return d;
-
-        const switches = d.switches.map((s) => {
-          if (s.id !== action.payload.switchId) return s;
-          return {
-            ...s,
-            name: action.payload.name,
-          };
-        });
-        return {
-          ...d,
-          switches,
-        };
+      const { switchId, deviceId, name } = action.payload;
+      state.switches = state.switches.map((s) => {
+        if (s.id !== switchId || s.deviceId !== deviceId) return s;
+        return { ...s, name };
       });
     });
-
     // update switch room type
-    builder.addCase(updateSwitchRoomType.fulfilled, (state, action) => {
-      state.devices = state.devices.map((d) => {
-        if (d.id !== action.payload.deviceId) return d;
-
-        const switches = d.switches.map((s) => {
-          if (s.id !== action.payload.switchId) return s;
-          return {
-            ...s,
-            roomType: action.payload.roomType,
-          };
-        });
-        return {
-          ...d,
-          switches,
-        };
+    builder.addCase(updateSwitchRoom.fulfilled, (state, action) => {
+      state.switches = state.switches.map((s) => {
+        const { deviceId, switchId, room } = action.payload;
+        if (s.deviceId !== deviceId || s.id !== switchId) return s;
+        return { ...s, room };
       });
     });
   },
 });
 
-export const { updateSwitchState } = domeSlice.actions;
+export const { updateSwitchState, cleanStore } = domeSlice.actions;
 
 export default domeSlice.reducer;

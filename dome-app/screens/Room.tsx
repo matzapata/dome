@@ -5,7 +5,7 @@ import { View, FlatList, Text, TouchableOpacity } from "react-native";
 
 import { Header } from "../components/Headers";
 import { UserStackParamList } from "../navigation/userStack";
-import { updateSwitchRoomType } from "../redux/slices/domeThunk";
+import { updateSwitchRoom } from "../redux/slices/domeThunk";
 import { useAppDispatch } from "../redux/store";
 
 const rooms = ["Bedroom", "Kitchen", "None"];
@@ -20,13 +20,13 @@ export default function RoomType() {
   const navigation = useNavigation<RoomTypeScreenProp>();
 
   const setRoom = (room: string) => {
-    dispatch(updateSwitchRoomType({ switchId, deviceId, roomType: room }));
+    dispatch(updateSwitchRoom({ switchId, deviceId, room: room }));
     navigation.goBack();
   };
 
   return (
     <View className="bg-white">
-      <Header title="Room type" />
+      <Header title="Room" />
 
       <FlatList
         data={rooms}

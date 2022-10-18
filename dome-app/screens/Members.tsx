@@ -5,16 +5,16 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAppSelector } from "../redux/store";
 import QRCode from "react-native-qrcode-svg";
 
-export default function PeopleScreen() {
-  const people = useAppSelector((state) => state.dome.members);
+export default function MembersScreen() {
+  const members = useAppSelector((state) => state.dome.members);
   const [shareDomeModalVisible, setShareDomeModalVisible] =
     React.useState(false);
 
   return (
     <View className="bg-white">
-      <Header title="People" />
+      <Header title="Members" />
 
-      {people.length === 0 ? (
+      {members.length === 0 ? (
         <View className="px-6 py-5 border-b border-gray-200">
           <Text className="text-lg font-semibold text-center text-gray-900">
             You haven&apos;t add any pearson to this dome
@@ -27,14 +27,14 @@ export default function PeopleScreen() {
       ) : (
         <FlatList
           className="border-b border-gray-200"
-          data={people}
+          data={members}
           renderItem={({ item }) => (
             <View className="px-6 py-4">
               <Text className="text-base font-medium">{item.name}</Text>
               <Text className="text-sm text-gray-500">{item.email}</Text>
             </View>
           )}
-          keyExtractor={(p) => p.id}
+          keyExtractor={(m) => m.id}
         />
       )}
 
@@ -43,9 +43,9 @@ export default function PeopleScreen() {
         onPress={() => setShareDomeModalVisible(true)}
       >
         <Ionicons name="add" size={24} color="#3182CE" />
-        <Text className="ml-4 font-medium text-blue-500">Add people</Text>
+        <Text className="ml-4 font-medium text-blue-500">Add member</Text>
       </TouchableOpacity>
-      <ShareDomeModal
+      <AddMemberModal
         isVisible={shareDomeModalVisible}
         setIsVisible={setShareDomeModalVisible}
       />
@@ -53,14 +53,14 @@ export default function PeopleScreen() {
   );
 }
 
-function ShareDomeModal({
+function AddMemberModal({
   isVisible,
   setIsVisible,
 }: {
   isVisible: boolean;
   setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const domeId = useAppSelector((state) => state.dome.domeId);
+  const domeId = useAppSelector((state) => state.dome.id);
   const userName = useAppSelector((state) => state.dome.user.name);
 
   return (
