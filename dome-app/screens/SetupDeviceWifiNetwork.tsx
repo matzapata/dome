@@ -19,7 +19,6 @@ type SetupDeviceWifiNetworkScreenProp = StackNavigationProp<
 >;
 
 export default function SetupDeviceWifiNetwork() {
-  const navigation = useNavigation<SetupDeviceWifiNetworkScreenProp>();
   const [ssid, setSsid] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [promptPassword, setPromptPassword] = React.useState(false);
@@ -42,6 +41,7 @@ export default function SetupDeviceWifiNetwork() {
         <Prompt
           title="Network password"
           visible={promptPassword}
+          secureTextEntry={true}
           onCancel={() => setPromptPassword(false)}
           onSubmit={(val) => {
             setPassword(val);

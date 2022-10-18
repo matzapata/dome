@@ -15,6 +15,7 @@ export default function Prompt({
   visible,
   onCancel,
   onSubmit,
+  secureTextEntry,
 }: {
   title: string;
   placeholder?: string;
@@ -22,6 +23,7 @@ export default function Prompt({
   visible: boolean;
   onCancel: () => void;
   onSubmit: (value: string) => void;
+  secureTextEntry?: boolean;
 }) {
   const [state, setState] = React.useState(defaultValue ? defaultValue : "");
 
@@ -40,6 +42,7 @@ export default function Prompt({
           autoFocus
           placeholder={placeholder}
           value={state}
+          secureTextEntry={secureTextEntry}
           onChangeText={(text) => setState(text)}
           className="mx-6 border-b-2 border-blue-500"
         />
