@@ -22,8 +22,6 @@ export default function MembersScreen() {
   const [memberMenuVisible, setMemberMenuVisible] = React.useState(false);
   const [memberMenu, setMemberMenu] = React.useState<DomeMember | null>(null);
 
-  console.log(userUid, isAdmin, members);
-
   return (
     <Screen>
       <View className="bg-white">

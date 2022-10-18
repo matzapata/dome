@@ -122,6 +122,9 @@ export const domeSlice = createSlice({
       state.switches = switches;
       state.loading = false;
     });
+    builder.addCase(fetchUserData.rejected, (state) => {
+      state.loading = false;
+    });
 
     // Join dome
     builder.addCase(joinDome.pending, (state) => {
@@ -142,6 +145,9 @@ export const domeSlice = createSlice({
       state.switches = switches;
       state.loading = false;
     });
+    builder.addCase(joinDome.rejected, (state) => {
+      state.loading = false;
+    });
 
     // Update username
     builder.addCase(updateUserName.pending, (state) => {
@@ -149,6 +155,9 @@ export const domeSlice = createSlice({
     });
     builder.addCase(updateUserName.fulfilled, (state, action) => {
       state.user.name = action.payload?.name;
+      state.loading = false;
+    });
+    builder.addCase(updateUserName.rejected, (state) => {
       state.loading = false;
     });
 
@@ -163,6 +172,9 @@ export const domeSlice = createSlice({
         return { ...d, name: action.payload.name };
       });
     });
+    builder.addCase(updateDeviceName.rejected, (state) => {
+      state.loading = false;
+    });
 
     // Update switch name
     builder.addCase(updateSwitchName.pending, (state) => {
@@ -176,6 +188,10 @@ export const domeSlice = createSlice({
         return { ...s, name };
       });
     });
+    builder.addCase(updateSwitchName.rejected, (state) => {
+      state.loading = false;
+    });
+
     // update switch room type
     builder.addCase(updateSwitchRoom.pending, (state) => {
       state.loading = true;
@@ -187,6 +203,9 @@ export const domeSlice = createSlice({
         if (s.deviceId !== deviceId || s.id !== switchId) return s;
         return { ...s, room };
       });
+    });
+    builder.addCase(updateSwitchRoom.rejected, (state) => {
+      state.loading = false;
     });
 
     // Add admin permissions
@@ -200,6 +219,9 @@ export const domeSlice = createSlice({
         return { ...m, isAdmin: true };
       });
     });
+    builder.addCase(makeAdmin.rejected, (state) => {
+      state.loading = false;
+    });
 
     // Remove admin permissions
     builder.addCase(removeAdmin.pending, (state) => {
@@ -212,6 +234,9 @@ export const domeSlice = createSlice({
         return { ...m, isAdmin: false };
       });
     });
+    builder.addCase(removeAdmin.rejected, (state) => {
+      state.loading = false;
+    });
 
     // Delete member
     builder.addCase(deleteMember.pending, (state) => {
@@ -220,6 +245,9 @@ export const domeSlice = createSlice({
     builder.addCase(deleteMember.fulfilled, (state, action) => {
       state.loading = false;
       state.members = state.members.filter((m) => m.id !== action.payload.uid);
+    });
+    builder.addCase(deleteMember.rejected, (state) => {
+      state.loading = false;
     });
   },
 });
