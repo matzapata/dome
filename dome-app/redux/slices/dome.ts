@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   fetchUserData,
+  joinDome,
   updateDeviceName,
   updateSwitchName,
   updateSwitchRoom,
@@ -37,6 +38,7 @@ export interface DomeState {
   user: {
     uid: string | null;
     name: string;
+    email: string;
     isAdmin: boolean;
   };
   members: DomeMember[];
@@ -49,6 +51,7 @@ const initialState: DomeState = {
   user: {
     uid: null,
     name: "",
+    email: "",
     isAdmin: false,
   },
   members: [],
@@ -99,6 +102,22 @@ export const domeSlice = createSlice({
       state.id = domeId;
       state.user.name = userName;
       state.user.uid = userUid;
+      state.user.isAdmin =
+        members.find((m: DomeMember) => m.id === state.user.uid) !== undefined;
+
+      state.devices = devices;
+      state.members = members;
+      state.switches = switches;
+    });
+
+    // Join dome
+    builder.addCase(joinDome.fulfilled, (state, action) => {
+      const { domeId } = action.payload;
+      const devices = extractDevicesFromDbPayload(action.payload.dbPayload);
+      const members = extractMembersFromDbPayload(action.payload.dbPayload);
+      const switches = extractSwitchesFromDbPayload(action.payload.dbPayload);
+
+      state.id = domeId;
       state.user.isAdmin =
         members.find((m: DomeMember) => m.id === state.user.uid) !== undefined;
 

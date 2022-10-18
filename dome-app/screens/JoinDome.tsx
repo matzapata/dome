@@ -1,9 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, StyleSheet, Modal, TouchableOpacity } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  Modal,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import { BarCodeScanner, BarCodeScannedCallback } from "expo-barcode-scanner";
 import { Header } from "../components/Headers";
+import { useNavigation } from "@react-navigation/native";
+import { useAppDispatch } from "../redux/store";
+import { joinDome } from "../redux/slices/domeThunk";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { UserStackParamList } from "../navigation/userStack";
+
+type JoinDomeScreenProp = StackNavigationProp<UserStackParamList, "Home">;
 
 export default function JoinDome() {
+  const navigation = useNavigation<JoinDomeScreenProp>();
+  const dispatch = useAppDispatch();
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState(false);
   const [data, setData] = useState("");
@@ -44,7 +60,17 @@ export default function JoinDome() {
         />
         <ConfirmationModal
           isVisible={scanned}
-          onConfirmation={() => console.log("Confirmed")}
+          ownerName={data.split("-")[1]}
+          onConfirmation={async () => {
+            setScanned(false);
+            try {
+              await dispatch(joinDome({ domeId: data.split("-")[0] })).unwrap();
+              Alert.alert("Successfully joined dome");
+              navigation.navigate("Home");
+            } catch (e) {
+              Alert.alert("Error joining dome", "Please try again");
+            }
+          }}
           onCancel={() => setScanned(false)}
         />
       </View>
@@ -53,10 +79,12 @@ export default function JoinDome() {
 
 function ConfirmationModal({
   isVisible,
+  ownerName,
   onConfirmation,
   onCancel,
 }: {
   isVisible: boolean;
+  ownerName: string;
   onConfirmation: () => void;
   onCancel: () => void;
 }) {
@@ -78,8 +106,7 @@ function ConfirmationModal({
           </Text>
 
           <Text className="px-6 ">
-            You&apos;ll control all matuzapata@gmail.com devices but wont be
-            capable of editing settings and adding new devices
+            You&apos;ll control all {ownerName} devices.
           </Text>
 
           <View className="flex flex-row">

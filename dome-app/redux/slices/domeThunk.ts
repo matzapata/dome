@@ -13,7 +13,7 @@ export const fetchUserData = createAsyncThunk(
     const { name, dome } = user.val();
     if (dome === "") return { userUid: payload.uid, userName: name };
 
-    const domeData = await get(ref(db, "domes/" + dome));
+    const domeData = await get(ref(db, `domes/${dome}`));
     if (!domeData.exists()) throw new Error("Non existent dome");
     const { devices, members } = domeData.val();
     return {
@@ -135,5 +135,26 @@ export const setSwitchState = createAsyncThunk(
     );
 
     return { ...payload };
+  }
+);
+
+export const joinDome = createAsyncThunk(
+  "domeThunk/joinDome",
+  async ({ domeId }: { domeId: string }, { getState }) => {
+    const {
+      dome: { user },
+    } = getState() as { dome: DomeState };
+    if (user.uid === null) throw new Error("User is not authenticated");
+
+    await update(ref(db, `users/${user.uid}`), { dome: domeId });
+    await update(ref(db, `domes/${domeId}/members`), {
+      [user.uid]: { name: user.name, email: user.email, isAdmin: false },
+    });
+
+    const domeData = await get(ref(db, `domes/${domeId}`));
+    if (!domeData.exists()) throw new Error("Non existent dome");
+    const { devices, members } = domeData.val();
+
+    return { domeId, dbPayload: { devices, members } };
   }
 );
