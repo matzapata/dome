@@ -12,6 +12,7 @@ import RoomType from "../screens/Room";
 import AddDevice from "../screens/AddDevice";
 import SetupDeviceWifiNetwork from "../screens/SetupDeviceWifiNetwork";
 import SetupDevice from "../screens/SetupDevice";
+import JoinDome from "../screens/JoinDome";
 
 export type UserStackParamList = {
   Home: undefined;
@@ -81,6 +82,11 @@ export default function UserStack() {
         <Stack.Screen
           name="SetupDevice"
           component={SetupDevice}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="JoinDome"
+          component={JoinDome}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

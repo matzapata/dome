@@ -50,29 +50,9 @@ export default function SettingsScreen() {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        className="px-6 py-4"
-        onPress={() => setConfirmResetModal(true)}
-      >
-        <Text className="text-base font-medium">Reset dome</Text>
-        <Text className="text-sm text-gray-500">
-          Revoke permissions and remove devices
-        </Text>
-      </TouchableOpacity>
-      <Confirm
-        title="Reset dome"
-        message="If you reset your dome, you and everybody at your dome will lose access to the devices. "
-        visible={confirmResetModal}
-        onCancel={() => setConfirmResetModal(false)}
-        onConfirm={() => {
-          setConfirmResetModal(false);
-          console.log("RESET DOME");
-        }}
-      />
-
       <View className="h-1 bg-gray-200" />
 
-      <View className="px-6">
+      <View className="px-6 pb-1">
         <Text className="my-2 text-xs text-gray-500">AVAILABLE DEVICES</Text>
         <FlatList
           data={devices}
@@ -99,13 +79,15 @@ export default function SettingsScreen() {
           )}
           keyExtractor={(d) => d.id}
         />
-        <TouchableOpacity
-          className="flex flex-row items-center py-4"
-          onPress={() => navigation.navigate("AddDevice")}
-        >
-          <Ionicons name="add" size={24} color="#3182CE" />
-          <Text className="ml-4 font-medium text-blue-500">Add device</Text>
-        </TouchableOpacity>
+        {devices.length === 0 && (
+          <TouchableOpacity
+            className="flex flex-row items-center py-4"
+            onPress={() => navigation.navigate("AddDevice")}
+          >
+            <Ionicons name="add" size={24} color="#3182CE" />
+            <Text className="ml-4 font-medium text-blue-500">Add device</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       <View className="h-1 bg-gray-200" />

@@ -5,7 +5,7 @@ import { Header } from "../components/Headers";
 
 export default function JoinDome() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [scanned, setScanned] = useState(true);
+  const [scanned, setScanned] = useState(false);
   const [data, setData] = useState("");
 
   useEffect(() => {
@@ -21,9 +21,17 @@ export default function JoinDome() {
   };
 
   if (hasPermission === null) {
-    return <Text>Requesting for camera permission</Text>;
+    return (
+      <View className="flex items-center justify-center flex-1">
+        <Text>Requesting for camera permission...</Text>
+      </View>
+    );
   } else if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
+    return (
+      <View className="flex items-center justify-center flex-1">
+        <Text>No access to camera</Text>
+      </View>
+    );
   } else
     return (
       <View className="flex flex-col justify-start flex-1">
