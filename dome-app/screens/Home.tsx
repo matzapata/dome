@@ -17,6 +17,7 @@ export default function HomeScreen() {
   const switches = useAppSelector((state) => state.dome.switches);
   const username = useAppSelector((state) => state.dome.user.name);
   const isAdmin = useAppSelector((state) => state.dome.user.isAdmin);
+  const domeId = useAppSelector((state) => state.dome.id);
 
   return (
     <Screen>
@@ -37,7 +38,7 @@ export default function HomeScreen() {
             <TouchableOpacity
               className="bg-[#27292D] flex-1 rounded-full py-3"
               onPress={() => {
-                if (!isAdmin) {
+                if (!isAdmin && domeId !== "") {
                   Toast.show("Only admin can add devices");
                 } else navigation.navigate("AddDevice");
               }}

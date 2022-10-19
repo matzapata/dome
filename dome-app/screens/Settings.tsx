@@ -19,6 +19,8 @@ export default function SettingsScreen() {
   const isAdmin = useAppSelector((state) => state.dome.user.isAdmin);
   const domeId = useAppSelector((state) => state.dome.id);
 
+  console.log(domeId);
+
   return (
     <Screen>
       <View className="bg-white">
@@ -83,7 +85,9 @@ export default function SettingsScreen() {
             )}
             keyExtractor={(d) => d.id}
           />
-          {devices.length === 0 && isAdmin && (
+
+          {devices.length === 0 && <Text>No devices available</Text>}
+          {devices.length === 0 && (isAdmin || domeId === "") && (
             <TouchableOpacity
               className="flex flex-row items-center py-4"
               onPress={() => navigation.navigate("AddDevice")}

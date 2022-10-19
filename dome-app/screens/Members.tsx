@@ -17,6 +17,7 @@ export default function MembersScreen() {
   const members = useAppSelector((state) => state.dome.members);
   const userUid = useAppSelector((state) => state.dome.user.uid);
   const isAdmin = useAppSelector((state) => state.dome.user.isAdmin);
+  const domeId = useAppSelector((state) => state.dome.id);
   const [shareDomeModalVisible, setShareDomeModalVisible] =
     React.useState(false);
   const [memberMenuVisible, setMemberMenuVisible] = React.useState(false);
@@ -65,7 +66,7 @@ export default function MembersScreen() {
         <TouchableOpacity
           className="flex flex-row items-center px-6 py-4"
           onPress={() => {
-            if (!isAdmin) {
+            if (!isAdmin && domeId !== "") {
               Toast.show("Only admin can add members");
             } else setShareDomeModalVisible(true);
           }}

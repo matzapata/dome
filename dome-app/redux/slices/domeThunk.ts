@@ -13,7 +13,9 @@ export const fetchUserData = createAsyncThunk(
     if (!user.exists()) throw new Error("Non existent user");
 
     const { name, dome } = user.val();
-    if (dome === "") return { userUid: payload.uid, userName: name };
+    if (dome === "") {
+      return { userUid: payload.uid, userName: name, domeId: "" };
+    }
 
     const domeData = await get(ref(db, `domes/${dome}`));
     if (!domeData.exists()) throw new Error("Non existent dome");
