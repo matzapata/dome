@@ -13,7 +13,7 @@
 /*************************************************************************************************
  **                                          DEFINES
  *************************************************************************************************/
-#define DEBUG false
+#define DEBUG true
 
 #define SSID_ADDR 0
 #define PASS_ADDR 50
@@ -23,12 +23,12 @@
 #define ACCESS_POINT_PASS ""
 #define EEPROM_BLOCK_SIZE 50
 
-#define NODE1_BTN D1
-#define NODE2_BTN D2
-#define NODE3_BTN D4
-#define NODE1_PIN D6
-#define NODE2_PIN D7
-#define NODE3_PIN D8
+#define NODE0_BTN D1
+#define NODE1_BTN D2
+#define NODE2_BTN D4
+#define NODE0_PIN D6
+#define NODE1_PIN D7
+#define NODE2_PIN D8
 
 #define CONFIG_BTN D1  // NODE1_BTN
 
@@ -51,15 +51,14 @@ char deviceId[EEPROM_BLOCK_SIZE];
 
 char pathBuffer[100];
 char serialBuffer[100];
-FirebaseData stream;
 FirebaseData fbdo;
 FirebaseAuth auth;
 FirebaseConfig config;
-volatile bool dataChanged = false;
-bool node1State = false;
-bool node2State = false;
-bool node3State = false;
 
+FirebaseData stream1;
+bool nodeStates[3] = { false };
+short nodePinout[3] = { NODE0_PIN, NODE1_PIN, NODE2_PIN };
+volatile bool nodeDataChanged[3] = { false };
 
 /*************************************************************************************************
  **                                    FUNCTION PROTOTYPES
@@ -205,18 +204,30 @@ void configurationMode() {
   }
 }
 
-void streamCallback(FirebaseStream data) {
-  printResult(data);  // addons/RTDBHelper.h
-  Serial.printf("Received stream payload size: %d (Max. %d)\n\n", data.payloadLength(), data.maxPayloadLength());
-  dataChanged = true;
-}
 
+#define STREAM_CALLBACK(NODE) \
+  void streamCallback##NODE(FirebaseStream data) { \
+    printResult(data); \
+    Serial.printf("Received stream payload size: %d (Max. %d)\n\n", data.payloadLength(), data.maxPayloadLength()); \
+    nodeDataChanged[NODE] = true; \
+  }
+
+#define BEGIN_NODE_FB_STREAM(NODE, NODE_STR) \
+  Serial.println("Listening on: /domes/dome_id/devices/device_id/switches/" NODE_STR "/state"); \
+  if (!Firebase.RTDB.beginStream(&stream##NODE, "/domes/dome_id/devices/device_id/switches/" NODE_STR "/state")) { \
+    Serial.printf("stream begin error, %s\n\n", stream##NODE.errorReason().c_str()); \
+  } \
+  Firebase.RTDB.setStreamCallback(&stream##NODE, streamCallback##NODE, streamTimeoutCallback);
+
+STREAM_CALLBACK(1)
+
+// Generic function that informs a network error on firebase rtdb listening
 void streamTimeoutCallback(bool timeout) {
   if (timeout)
     Serial.println("stream timed out, resuming...\n");
 
-  if (!stream.httpConnected())
-    Serial.printf("error code: %d, reason: %s\n\n", stream.httpCode(), stream.errorReason().c_str());
+  if (!stream1.httpConnected())
+    Serial.printf("error code: %d, reason: %s\n\n", stream1.httpCode(), stream1.errorReason().c_str());
 }
 
 void firebaseBegin() {
@@ -232,54 +243,16 @@ void firebaseBegin() {
   Firebase.reconnectWiFi(true);
 
   // Begin stream and set stream callback
-  if (!Firebase.RTDB.beginStream(&stream, "/" + String(homeId) + "/" + String(deviceId))) {
-    Serial.printf("stream begin error, %s\n\n", stream.errorReason().c_str());
-  }
-  Firebase.RTDB.setStreamCallback(&stream, streamCallback, streamTimeoutCallback);
+  BEGIN_NODE_FB_STREAM(1, "2")
 }
 
-void firebaseGpioUpdate() {
-  String streamPath = String(stream.dataPath());
-  Serial.print("Stream path: ");
-  Serial.println(streamPath);
-
-  // if the data returned is an integer, there was a change on the GPIO state on the following path /{gpio_number}
-  if (stream.dataTypeEnum() == fb_esp_rtdb_data_type_integer) {
-    int nodeNumber = streamPath.substring(1).toInt();
-    int state = stream.intData();
-    if (nodeNumber == 1) node1State = state;
-    else if (nodeNumber == 2) node2State = state;
-    else if (nodeNumber == 3) node3State = state;
-
-    Serial.print("NODE: ");
-    Serial.print(nodeNumber);
-    Serial.print(" STATE: ");
-    Serial.println(state);
+#define FB_GPIO_UPDATE(NODE) \
+  if (stream1.dataTypeEnum() == fb_esp_rtdb_data_type_boolean) { \
+    bool state = stream1.boolData(); \
+    nodeStates[NODE] = state; \
+    Serial.print("NODE: 0 STATE:"); \
+    Serial.println(state); \
   }
-
-  // Update gpio states on first run.
-  if (stream.dataTypeEnum() == fb_esp_rtdb_data_type_json) {
-    FirebaseJson json = stream.to<FirebaseJson>();
-
-    // Iterate json data
-    size_t count = json.iteratorBegin();
-    for (size_t i = 0; i < count; i++) {
-      FirebaseJson::IteratorValue value = json.valueAt(i);
-      int nodeNumber = value.key.toInt();
-      int state = value.value.toInt();
-
-      if (nodeNumber == 1) node1State = state;
-      else if (nodeNumber == 2) node2State = state;
-      else if (nodeNumber == 3) node3State = state;
-
-      Serial.print("NODE: ");
-      Serial.print(nodeNumber);
-      Serial.print(" STATE: ");
-      Serial.println(state);
-    }
-    json.iteratorEnd();  // free memory
-  }
-}
 
 /*************************************************************************************************
  **                                          MAIN
@@ -289,13 +262,13 @@ void setup() {
   EEPROM.begin(512);
   Serial.begin(115200);
 
+  pinMode(NODE0_BTN, INPUT);
   pinMode(NODE1_BTN, INPUT);
   pinMode(NODE2_BTN, INPUT);
-  pinMode(NODE3_BTN, INPUT);
 
+  pinMode(NODE0_PIN, OUTPUT);
   pinMode(NODE1_PIN, OUTPUT);
   pinMode(NODE2_PIN, OUTPUT);
-  pinMode(NODE3_PIN, OUTPUT);
 
 #if !DEBUG
   if (digitalRead(CONFIG_BTN)) {
@@ -310,31 +283,36 @@ void setup() {
 }
 
 void loop() {
-  if (Firebase.ready()) {
-    if (digitalRead(NODE1_BTN)) {
-      node1State = !node1State;
-      sprintf(pathBuffer, "/%s/%s/1", homeId, deviceId);
-      Firebase.RTDB.setInt(&fbdo, pathBuffer, (int)node1State);
-      delay(200);
-    } else if (digitalRead(NODE2_BTN)) {
-      node2State = !node2State;
-      sprintf(pathBuffer, "/%s/%s/2", homeId, deviceId);
-      Firebase.RTDB.setInt(&fbdo, pathBuffer, (int)node2State);
-      delay(200);
-    } else if (digitalRead(NODE3_BTN)) {
-      node3State = !node3State;
-      sprintf(pathBuffer, "/%s/%s/3", homeId, deviceId);
-      Firebase.RTDB.setInt(&fbdo, pathBuffer, (int)node3State);
-      delay(200);
+//  if (Firebase.ready()) {
+//    if (digitalRead(NODE1_BTN)) {
+//      node1State = !node1State;
+//      sprintf(pathBuffer, "/%s/%s/1", homeId, deviceId);
+//      Firebase.RTDB.setInt(&fbdo, pathBuffer, (int)node1State);
+//      delay(200);
+//    } else if (digitalRead(NODE2_BTN)) {
+//      node2State = !node2State;
+//      sprintf(pathBuffer, "/%s/%s/2", homeId, deviceId);
+//      Firebase.RTDB.setInt(&fbdo, pathBuffer, (int)node2State);
+//      delay(200);
+//    } else if (digitalRead(NODE3_BTN)) {
+//      node3State = !node3State;
+//      sprintf(pathBuffer, "/%s/%s/3", homeId, deviceId);
+//      Firebase.RTDB.setInt(&fbdo, pathBuffer, (int)node3State);
+//      delay(200);
+//    }
+//  }
+
+  if (nodeDataChanged[1]) {
+    nodeDataChanged[1] = false;
+    if (stream1.dataTypeEnum() == fb_esp_rtdb_data_type_boolean) { 
+      bool state = stream1.boolData(); 
+      nodeStates[1] = state; 
+      Serial.print("NODE: 0 STATE:"); 
+      Serial.println(state); 
     }
   }
 
-  if (dataChanged) {
-    dataChanged = false;
-    firebaseGpioUpdate();
-  }
-
-  digitalWrite(NODE1_PIN, node1State);
-  digitalWrite(NODE2_PIN, node2State);
-  digitalWrite(NODE3_PIN, node3State);
+  digitalWrite(NODE0_PIN, nodeStates[0]);
+  digitalWrite(NODE1_PIN, nodeStates[1]);
+  digitalWrite(NODE2_PIN, nodeStates[2]);
 }
