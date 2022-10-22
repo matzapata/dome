@@ -31,6 +31,8 @@ FirebaseData stream2;
 
 char pathBuffer[100];
 bool nodeStates[3] = { false };
+short nodePinMapout[3] = { NODE0_PIN, NODE1_PIN, NODE2_PIN };
+short nodeBtnMapout[3] = { NODE0_BTN, NODE1_BTN, NODE2_BTN };
 volatile bool nodeDataChanged[3] = { false };
 
 /*************************************************************************************************
@@ -59,7 +61,16 @@ volatile bool nodeDataChanged[3] = { false };
       Serial.printf("error code: %d, reason: %s\n\n", stream##NODE.httpCode(), stream##NODE.errorReason().c_str()); \
   }
 
-#define SYNC_NODE(NODE) \
+#define SYNC_NODE(NODE, NODE_STR) \
+  if (Firebase.ready()) { \
+    if (digitalRead(nodeBtnMapout[NODE])) { \
+      nodeStates[NODE] = !nodeStates[NODE]; \
+      sprintf(pathBuffer, "/domes/%s/devices/%s/switches/" NODE_STR "/state", homeId, deviceId); \
+      Serial.printf("Update state: %s\n", pathBuffer); \
+      Firebase.RTDB.setBool(&fbdo, pathBuffer, (bool)nodeStates[NODE]); \
+      delay(200); \
+    } \
+  } \
   if (nodeDataChanged[NODE]) { \
     nodeDataChanged[NODE] = false; \
     if (stream##NODE.dataTypeEnum() == fb_esp_rtdb_data_type_boolean) { \
@@ -80,28 +91,12 @@ volatile bool nodeDataChanged[3] = { false };
 /*************************************************************************************************
  **                                    FUNCTIONS IMPLEMENTATIONS
  *************************************************************************************************/
-
 STREAM_TIMEOUT_CALLBACK(0)
 STREAM_CALLBACK(0)
-
 STREAM_TIMEOUT_CALLBACK(1)
 STREAM_CALLBACK(1)
-
 STREAM_TIMEOUT_CALLBACK(2)
 STREAM_CALLBACK(2)
-
-void firebaseBegin() {
-  config.api_key = API_KEY;
-  auth.user.email = USER_EMAIL;
-  auth.user.password = USER_PASSWORD;
-  config.database_url = DATABASE_URL;
-
-  // Assign the callback function for the long running token generation task. addons/TokenHelper.h
-  config.token_status_callback = tokenStatusCallback;
-
-  Firebase.begin(&config, &auth);
-  Firebase.reconnectWiFi(true);
-}
 
 /*************************************************************************************************
  **                                          MAIN
@@ -121,7 +116,13 @@ void setup() {
   connectionBegin(CONFIG_BTN);
 
   // Initiate fb connection
-  firebaseBegin();
+  config.api_key = API_KEY;
+  auth.user.email = USER_EMAIL;
+  auth.user.password = USER_PASSWORD;
+  config.database_url = DATABASE_URL;
+  config.token_status_callback = tokenStatusCallback;
+  Firebase.begin(&config, &auth);
+  Firebase.reconnectWiFi(true);
 
   BEGIN_NODE_FB_STREAM(0, "0")
   BEGIN_NODE_FB_STREAM(1, "1")
@@ -129,28 +130,9 @@ void setup() {
 }
 
 void loop() {
-//  if (Firebase.ready()) {
-//    if (digitalRead(NODE1_BTN)) {
-//      node1State = !node1State;
-//      sprintf(pathBuffer, "/%s/%s/1", homeId, deviceId);
-//      Firebase.RTDB.setInt(&fbdo, pathBuffer, (int)node1State);
-//      delay(200);
-//    } else if (digitalRead(NODE2_BTN)) {
-//      node2State = !node2State;
-//      sprintf(pathBuffer, "/%s/%s/2", homeId, deviceId);
-//      Firebase.RTDB.setInt(&fbdo, pathBuffer, (int)node2State);
-//      delay(200);
-//    } else if (digitalRead(NODE3_BTN)) {
-//      node3State = !node3State;
-//      sprintf(pathBuffer, "/%s/%s/3", homeId, deviceId);
-//      Firebase.RTDB.setInt(&fbdo, pathBuffer, (int)node3State);
-//      delay(200);
-//    }
-//  }
-
-  SYNC_NODE(0)
-  SYNC_NODE(1)
-  SYNC_NODE(2)
+  SYNC_NODE(0, "0")
+  SYNC_NODE(1, "1")
+  SYNC_NODE(2, "2")
 
   digitalWrite(NODE0_PIN, nodeStates[0]);
   digitalWrite(NODE1_PIN, nodeStates[1]);
