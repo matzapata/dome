@@ -1,7 +1,6 @@
 /*************************************************************************************************
  **                                          INCLUDES
  *************************************************************************************************/
-
 #include "Secrets.h"
 #include <Firebase_ESP_Client.h> // 4.1.0
 #include <addons/TokenHelper.h>
@@ -23,26 +22,27 @@
 /*************************************************************************************************
  **                                      GLOBAL VARIABLES
  *************************************************************************************************/
-char pathBuffer[100];
 FirebaseData fbdo;
 FirebaseAuth auth;
 FirebaseConfig config;
-
 FirebaseData stream0;
+FirebaseData stream1;
+FirebaseData stream2;
+
+char pathBuffer[100];
 bool nodeStates[3] = { false };
-short nodePinout[3] = { NODE0_PIN, NODE1_PIN, NODE2_PIN };
 volatile bool nodeDataChanged[3] = { false };
 
 /*************************************************************************************************
- **                                    FUNCTION PROTOTYPES
+ **                                    MACROS
  *************************************************************************************************/
-
-void setup();
-void loop();
-
-/*************************************************************************************************
- **                                    FUNCTIONS IMPLEMENTATIONS
- *************************************************************************************************/
+#define BEGIN_NODE_FB_STREAM(NODE, NODE_STR) \
+  sprintf(pathBuffer, "/domes/%s/devices/%s/switches/" NODE_STR "/state", homeId, deviceId); \
+  Serial.printf("Listening on: %s\n", pathBuffer); \
+  if (!Firebase.RTDB.beginStream(&stream##NODE, pathBuffer)) { \
+    Serial.printf("stream begin error, %s\n\n", stream##NODE.errorReason().c_str()); \
+  } \
+  Firebase.RTDB.setStreamCallback(&stream##NODE, streamCallback##NODE, streamTimeoutCallback##NODE);
 
 #define STREAM_CALLBACK(NODE) \
   void streamCallback##NODE(FirebaseStream data) { \
@@ -51,41 +51,15 @@ void loop();
     nodeDataChanged[NODE] = true; \
   }
 
-#define BEGIN_NODE_FB_STREAM(NODE, NODE_STR) \
-  Serial.println("Listening on: /domes/dome_id/devices/device_id/switches/" NODE_STR "/state"); \
-  if (!Firebase.RTDB.beginStream(&stream##NODE, "/domes/dome_id/devices/device_id/switches/" NODE_STR "/state")) { \
-    Serial.printf("stream begin error, %s\n\n", stream##NODE.errorReason().c_str()); \
-  } \
-  Firebase.RTDB.setStreamCallback(&stream##NODE, streamCallback##NODE, streamTimeoutCallback);
+#define STREAM_TIMEOUT_CALLBACK(NODE) \
+  void streamTimeoutCallback##NODE(bool timeout) { \
+    if (timeout) \
+      Serial.println("stream timed out, resuming...\n"); \
+    if (!stream##NODE.httpConnected()) \
+      Serial.printf("error code: %d, reason: %s\n\n", stream##NODE.httpCode(), stream##NODE.errorReason().c_str()); \
+  }
 
-STREAM_CALLBACK(0)
-
-// Generic function that informs a network error on firebase rtdb listening
-void streamTimeoutCallback(bool timeout) {
-  if (timeout)
-    Serial.println("stream timed out, resuming...\n");
-
-  if (!stream0.httpConnected())
-    Serial.printf("error code: %d, reason: %s\n\n", stream0.httpCode(), stream0.errorReason().c_str());
-}
-
-void firebaseBegin() {
-  config.api_key = API_KEY;
-  auth.user.email = USER_EMAIL;
-  auth.user.password = USER_PASSWORD;
-  config.database_url = DATABASE_URL;
-
-  // Assign the callback function for the long running token generation task. addons/TokenHelper.h
-  config.token_status_callback = tokenStatusCallback;
-
-  Firebase.begin(&config, &auth);
-  Firebase.reconnectWiFi(true);
-
-  // Begin stream and set stream callback
-  BEGIN_NODE_FB_STREAM(0, "0")
-}
-
-#define SYNC_GPIO(NODE) \
+#define SYNC_NODE(NODE) \
   if (nodeDataChanged[NODE]) { \
     nodeDataChanged[NODE] = false; \
     if (stream##NODE.dataTypeEnum() == fb_esp_rtdb_data_type_boolean) { \
@@ -99,6 +73,37 @@ void firebaseBegin() {
   }
 
 /*************************************************************************************************
+ **                                    FUNCTION PROTOTYPES
+ *************************************************************************************************/
+
+
+/*************************************************************************************************
+ **                                    FUNCTIONS IMPLEMENTATIONS
+ *************************************************************************************************/
+
+STREAM_TIMEOUT_CALLBACK(0)
+STREAM_CALLBACK(0)
+
+STREAM_TIMEOUT_CALLBACK(1)
+STREAM_CALLBACK(1)
+
+STREAM_TIMEOUT_CALLBACK(2)
+STREAM_CALLBACK(2)
+
+void firebaseBegin() {
+  config.api_key = API_KEY;
+  auth.user.email = USER_EMAIL;
+  auth.user.password = USER_PASSWORD;
+  config.database_url = DATABASE_URL;
+
+  // Assign the callback function for the long running token generation task. addons/TokenHelper.h
+  config.token_status_callback = tokenStatusCallback;
+
+  Firebase.begin(&config, &auth);
+  Firebase.reconnectWiFi(true);
+}
+
+/*************************************************************************************************
  **                                          MAIN
  *************************************************************************************************/
 
@@ -108,14 +113,19 @@ void setup() {
   pinMode(NODE0_BTN, INPUT);
   pinMode(NODE1_BTN, INPUT);
   pinMode(NODE2_BTN, INPUT);
-
   pinMode(NODE0_PIN, OUTPUT);
   pinMode(NODE1_PIN, OUTPUT);
   pinMode(NODE2_PIN, OUTPUT);
 
+  // Initiate wifi access point if no credentials stored or connect to wifi
   connectionBegin(CONFIG_BTN);
 
+  // Initiate fb connection
   firebaseBegin();
+
+  BEGIN_NODE_FB_STREAM(0, "0")
+  BEGIN_NODE_FB_STREAM(1, "1")
+  BEGIN_NODE_FB_STREAM(2, "2")
 }
 
 void loop() {
@@ -138,7 +148,9 @@ void loop() {
 //    }
 //  }
 
-  SYNC_GPIO(0)
+  SYNC_NODE(0)
+  SYNC_NODE(1)
+  SYNC_NODE(2)
 
   digitalWrite(NODE0_PIN, nodeStates[0]);
   digitalWrite(NODE1_PIN, nodeStates[1]);
